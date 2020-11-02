@@ -1,0 +1,43 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: gengzi_spring_security
+  thymeleaf:
+    cache: false
+  profiles:
+    # 可以配置多个。逗号分隔
+    active: dev
+  datasource:
+    # 注意mysql 时区 字符集编码
+    url: jdbc:mysql://127.0.0.1:3306/sqltest?autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: 111
+    type: com.alibaba.druid.pool.DruidDataSource
+    # redis 配置
+  redis:
+    redisson:
+      file: classpath:redisson.yml
+
+#    redisson:
+#      config: classpath:redisson.yml
+  jpa: #jpa配置
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+      hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/templates/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
+  session:
+    store-type: redis
+    timeout:
+      seconds: 900
+  security:
+    user:
+      name: user
+      password: 111
+

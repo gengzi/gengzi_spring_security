@@ -1,0 +1,4 @@
+singleServerConfig:
+  address: "redis://123.206.30.117:6378"
+  password: gengzi666
+  database: 1

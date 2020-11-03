@@ -14,10 +14,16 @@ import org.springframework.session.web.context.AbstractHttpSessionApplicationIni
 import java.io.IOException;
 
 /**
- * *  参考
- * *  https://github.com/redisson/redisson/wiki/14.-Integration-with-frameworks#147-spring-session
+ * <h1>redisson 配置</h1>
+ *
+ * @author gengzi
+ * @date 2020年11月3日14:59:45
+ *
+ * 参考
+ * https://github.com/redisson/redisson/wiki/14.-Integration-with-frameworks#147-spring-session
  */
 @Configuration
+// 启用redis管理会话
 @EnableRedisHttpSession
 public class RedissonSpringDataConfig extends AbstractHttpSessionApplicationInitializer {
 

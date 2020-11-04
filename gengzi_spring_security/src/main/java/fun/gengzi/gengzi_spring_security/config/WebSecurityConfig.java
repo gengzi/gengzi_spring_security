@@ -1,6 +1,7 @@
 package fun.gengzi.gengzi_spring_security.config;
 
 import fun.gengzi.gengzi_spring_security.service.impl.UserDetailsServiceImpl;
+import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
@@ -74,6 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // 自定义表单认证方式
         http.authorizeRequests()
+                .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
                 .anyRequest().authenticated().and().formLogin().and().httpBasic().and()// and 作为中断上一个属性的配置分隔
                 .csrf().disable()// csrf 防止跨站脚本攻击
                 .sessionManagement((sessionManagement) -> sessionManagement
@@ -108,4 +111,61 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(HttpMethod.OPTIONS);
     }
+
+//    /**
+//     * 认证方式：httpBasic
+//     *
+//     * @param http
+//     * @throws Exception
+//     */
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        // 使用 security 提供的 操作 记住我 表的 dao层
+//        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+//        jdbcTokenRepository.setDataSource(dataSource);
+//
+//        // super.configure(http);
+//        // http 基本认证方式  默认提供了一个简单的登陆页面
+//        // http.authorizeRequests().anyRequest().authenticated().and().formLogin().and().httpBasic();
+//
+//        // 自定义表单认证方式
+//        http.authorizeRequests()
+//                .antMatchers("/securityBase/adminApi/**").hasRole("ADMIN")  //管理员 才能访问
+//                .antMatchers("/securityBase/userApi/**").hasRole("USER")   //登录用户 才能访问
+//                .antMatchers("/securityBase/publicApi/**").permitAll()  // 都可以访问
+//                .anyRequest().authenticated()   // 验证所有的请求
+//                .and()// and 作为中断上一个属性的配置分隔
+//                .formLogin() // 表单登陆
+//                .authenticationDetailsSource(myAuthenticationDetailsSource)
+//                .loginPage("/login.html")// 登陆的页面
+//                .loginProcessingUrl("/login")// 登陆的url
+//                .successHandler((httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法
+//                    // 成功登录所要做的操作
+//                    final ReturnData ret = ReturnData.newInstance();
+//                    ret.setSuccess();
+//                    ret.setMessage("登陆成功");
+//                    ret.setInfo(authentication);
+//                    HttpResponseUtils.responseResult(httpServletResponse, ret);
+//                })
+//                .failureHandler((httpServletRequest, httpServletResponse, e) -> {  // 认证失败的处理方法
+//                    // 登陆失败所要做的操作
+//                    final ReturnData ret = ReturnData.newInstance();
+//                    ret.setFailure("登陆失败");
+//                    HttpResponseUtils.responseResult(httpServletResponse, ret);
+//
+//                })
+//                .permitAll()// 设置登陆页面和登陆路径 不设限访问
+//                .and()
+//                .csrf().disable() // csrf 防止跨站脚本攻击
+//                .formLogin()
+//                .and()
+//                .rememberMe()// 记住我
+//                .userDetailsService(userDetailService)
+//                .tokenRepository(jdbcTokenRepository)
+//                .and()
+//                .logout()
+//                .logoutSuccessUrl("/").and() // 注销登陆
+//                .sessionManagement().invalidSessionStrategy(new MyInvalidSessionStrategy()) // session失效后的策略
+//                .and().sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry()); // 使用 spring session 提供的会话注册表
+//    }
 }

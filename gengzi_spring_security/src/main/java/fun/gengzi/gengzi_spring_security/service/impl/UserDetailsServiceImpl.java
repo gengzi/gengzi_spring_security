@@ -3,9 +3,13 @@ package fun.gengzi.gengzi_spring_security.service.impl;
 import fun.gengzi.gengzi_spring_security.constant.RspCodeEnum;
 import fun.gengzi.gengzi_spring_security.constant.UserStatusEnum;
 import fun.gengzi.gengzi_spring_security.exception.RrException;
+import fun.gengzi.gengzi_spring_security.sys.controller.UsersController;
+import fun.gengzi.gengzi_spring_security.sys.service.UsersService;
 import fun.gengzi.gengzi_spring_security.user.UserDetail;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,26 +32,34 @@ import java.util.HashSet;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
+    private UsersService usersService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ReturnData result = new ReturnData();
-        UserDetail userDetailByDb = new UserDetail();
-        userDetailByDb.setUsername("user");
-        userDetailByDb.setPassword(passwordEncoder.encode("111"));
-        userDetailByDb.setStatus(1);
-        result.setInfo(userDetailByDb);
+//        ReturnData result = new ReturnData();
+        // 构造一个简单的 用户信息
+//        UserDetail userDetailByDb = new UserDetail();
+//        userDetailByDb.setUsername("user");
+//        userDetailByDb.setPassword(passwordEncoder.encode("111"));
+//        userDetailByDb.setStatus(1);
+//        HashSet<GrantedAuthority> roleSet = new HashSet<>();
+//        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ADMIN");
+//        roleSet.add(simpleGrantedAuthority);
+//        userDetailByDb.setAuthorities(roleSet);
+//
+//        result.setInfo(userDetailByDb);
+        ReturnData result = usersService.loadUserByUsername(username);
         UserDetail userDetail = (UserDetail) result.getInfo();
         if (userDetail == null) {
             throw new RrException(RspCodeEnum.ACCOUNT_NOT_EXIST.getDesc());
         }
-
         //账号不可用
         if (userDetail.getStatus() == UserStatusEnum.DISABLE.getValue()) {
             userDetail.setEnabled(false);
         }
-
         return userDetail;
     }
 }

@@ -23,7 +23,7 @@ public class UserDetail implements UserDetails {
 
     private Long id;
     private String username;
-    private String realName;
+    private String realname;
     private String headUrl;
     private Integer gender;
     private String email;

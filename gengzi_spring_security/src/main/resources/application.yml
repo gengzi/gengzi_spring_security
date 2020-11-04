@@ -10,7 +10,7 @@ spring:
     active: dev
   datasource:
     # 注意mysql 时区 字符集编码
-    url: jdbc:mysql://127.0.0.1:3306/sqltest?autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://127.0.0.1:3306/sys_manager?autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
     password: 111
     type: com.alibaba.druid.pool.DruidDataSource

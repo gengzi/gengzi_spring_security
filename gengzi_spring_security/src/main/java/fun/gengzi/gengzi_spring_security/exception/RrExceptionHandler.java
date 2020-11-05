@@ -1,10 +1,12 @@
 package fun.gengzi.gengzi_spring_security.exception;
 
+import com.alibaba.druid.wall.violation.ErrorCode;
 import fun.gengzi.gengzi_spring_security.constant.RspCodeEnum;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -32,6 +34,15 @@ public class RrExceptionHandler {
         logger.error(e.getMessage(), e);
         ReturnData returnData = ReturnData.newInstance();
         returnData.setFailure("数据库中已存在该记录！");
+        return returnData;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ReturnData handleAccessDeniedException(AccessDeniedException ex){
+        logger.error(ex.getMessage(), ex);
+        ReturnData returnData = ReturnData.newInstance();
+        returnData.setFailure("无权限");
+        returnData.setStatus(RspCodeEnum.NOT_ACCESS.getCode());
         return returnData;
     }
 

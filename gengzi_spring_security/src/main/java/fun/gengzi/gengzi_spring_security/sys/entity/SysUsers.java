@@ -19,7 +19,7 @@ public class SysUsers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 //主键
     @Column(name = "id")
-    private Integer id;
+    private Long id;
     //登陆用户名
     @Column(name = "username")
     private String username;

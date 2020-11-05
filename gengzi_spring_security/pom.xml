@@ -111,6 +111,7 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--security单元测试-->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>

@@ -18,6 +18,7 @@ public enum RspCodeEnum {
     ERROR(0, "error"),
     ERROR_SYSTEM(500, "system error"),
     FAILURE(1000, "failure"),
+    NOT_ACCESS(403,"无权限"),
     ACCOUNT_NOT_EXIST(5001,"ACCOUNT_NOT_EXIST"),
     NOTOKEN(5000, "no token");
 

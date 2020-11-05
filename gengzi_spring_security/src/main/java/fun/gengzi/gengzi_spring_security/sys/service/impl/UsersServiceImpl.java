@@ -1,5 +1,6 @@
 package fun.gengzi.gengzi_spring_security.sys.service.impl;
 
+import fun.gengzi.gengzi_spring_security.constant.RspCodeEnum;
 import fun.gengzi.gengzi_spring_security.sys.dao.RolePermissionDao;
 import fun.gengzi.gengzi_spring_security.sys.dao.SysPermissionDao;
 import fun.gengzi.gengzi_spring_security.sys.dao.SysUsersDao;
@@ -35,23 +36,30 @@ public class UsersServiceImpl implements UsersService {
     @Autowired
     private SysPermissionDao sysPermissionDao;
 
-
+    /**
+     * 根据用户名查询用户信息
+     * @param userName 用户名
+     * @return
+     */
     @Override
     public ReturnData loadUserByUsername(String userName) {
         ReturnData ret = ReturnData.newInstance();
         SysUsers sysUsers = sysUsersDao.findByUsername(userName);
+        if (sysUsers == null || sysUsers.getId() == null) {
+            ret.setFailure("系统中无此用户");
+            ret.setStatus(RspCodeEnum.NOTOKEN.getCode());
+            return ret;
+        }
         UserDetail userDetail = ConvertUtils.sourceToTarget(sysUsers, UserDetail.class);
         userDetail.setStatus(sysUsers.getIsEnable());
-//        List<UserRoleDao> byUserId = userRoleDao.findByUserId(sysUsers.getId());
+        // 查询此用户对应的权限（菜单）
         List<SysPermission> sysPermissions = sysPermissionDao.qryPermissionInfoByUserId(sysUsers.getId());
-//        userDetail.setPassword(passwordEncoder.encode(userDetail.getPassword()));
         Set<String> permsSet = new HashSet<>();
         sysPermissions.forEach(sysPermission -> {
             if (StringUtils.isNotBlank(sysPermission.getPermission())) {
                 permsSet.add(sysPermission.getPermission());
             }
         });
-//        permsSet.add("admin");
         //封装权限标识
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.addAll(permsSet.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet()));

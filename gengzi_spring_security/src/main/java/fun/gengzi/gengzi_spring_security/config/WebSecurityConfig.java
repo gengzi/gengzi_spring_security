@@ -80,9 +80,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // 自定义表单认证方式
         http.authorizeRequests()
+                // 放行swagger-ui相关的路径
+                .antMatchers("/swagger").permitAll()
                 .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
                 .anyRequest().authenticated().and().formLogin().and().httpBasic().and()// and 作为中断上一个属性的配置分隔
                 .csrf().disable()// csrf 防止跨站脚本攻击
+
+
+
                 .sessionManagement((sessionManagement) -> sessionManagement
                         .maximumSessions(2)
                         .sessionRegistry(sessionRegistry()));

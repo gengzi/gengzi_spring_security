@@ -52,6 +52,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //
 //        result.setInfo(userDetailByDb);
         ReturnData result = usersService.loadUserByUsername(username);
+        if (RspCodeEnum.NOTOKEN.getCode() == result.getStatus()) {
+            throw new RrException(RspCodeEnum.ACCOUNT_NOT_EXIST.getDesc());
+        }
         UserDetail userDetail = (UserDetail) result.getInfo();
         if (userDetail == null) {
             throw new RrException(RspCodeEnum.ACCOUNT_NOT_EXIST.getDesc());

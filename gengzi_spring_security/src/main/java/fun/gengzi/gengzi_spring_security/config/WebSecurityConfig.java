@@ -1,6 +1,7 @@
 package fun.gengzi.gengzi_spring_security.config;
 
 import fun.gengzi.gengzi_spring_security.service.impl.UserDetailsServiceImpl;
+import fun.gengzi.gengzi_spring_security.utils.HttpResponseUtils;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -85,11 +86,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
                 .anyRequest().authenticated().and().formLogin().and().httpBasic().and()// and 作为中断上一个属性的配置分隔
                 .csrf().disable()// csrf 防止跨站脚本攻击
-
-
-
+                .formLogin()
+                .successHandler((httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法
+                    // 成功登录所要做的操作
+                    final ReturnData ret = ReturnData.newInstance();
+                    ret.setSuccess();
+                    ret.setMessage("登陆成功");
+                    ret.setInfo(authentication);
+                    HttpResponseUtils.responseResult(httpServletResponse, ret);
+                }).and()
                 .sessionManagement((sessionManagement) -> sessionManagement
-                        .maximumSessions(2)
+                        .maximumSessions(100)
                         .sessionRegistry(sessionRegistry()));
     }
 

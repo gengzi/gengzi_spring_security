@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
+import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
+import org.springframework.session.web.http.HttpSessionIdResolver;
 
 import java.io.IOException;
 
@@ -18,7 +21,7 @@ import java.io.IOException;
  *
  * @author gengzi
  * @date 2020年11月3日14:59:45
- *
+ * <p>
  * 参考
  * https://github.com/redisson/redisson/wiki/14.-Integration-with-frameworks#147-spring-session
  */
@@ -37,5 +40,11 @@ public class RedissonSpringDataConfig extends AbstractHttpSessionApplicationInit
         Config config = Config.fromYAML(configFile.getInputStream());
         return Redisson.create(config);
     }
+
+    @Bean
+    public HttpSessionIdResolver httpSessionIdResolver() {
+        return HeaderHttpSessionIdResolver.authenticationInfo();
+    }
+
 
 }

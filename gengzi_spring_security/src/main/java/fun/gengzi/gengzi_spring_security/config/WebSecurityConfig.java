@@ -1,5 +1,6 @@
 package fun.gengzi.gengzi_spring_security.config;
 
+import fun.gengzi.gengzi_spring_security.constant.IgnoringUrlConstant;
 import fun.gengzi.gengzi_spring_security.service.impl.UserDetailsServiceImpl;
 import fun.gengzi.gengzi_spring_security.utils.HttpResponseUtils;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
@@ -82,9 +83,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 自定义表单认证方式
         http.authorizeRequests()
                 // 放行swagger-ui相关的路径
-                .antMatchers("/swagger").permitAll()
+                .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
                 .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
-                .anyRequest().authenticated().and().formLogin().and().httpBasic().and()// and 作为中断上一个属性的配置分隔
+                .anyRequest().authenticated().and().formLogin().loginProcessingUrl("/login").and()
+                .httpBasic().and()// and 作为中断上一个属性的配置分隔
                 .csrf().disable()// csrf 防止跨站脚本攻击
                 .formLogin()
                 .successHandler((httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法

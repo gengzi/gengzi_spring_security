@@ -21,4 +21,7 @@ public class IgnoringUrlConstant {
             "/doc.html"
     };
 
+    public static final String[] IGNORING_STATIC_URLS = {
+            "/js/**"
+    };
 }

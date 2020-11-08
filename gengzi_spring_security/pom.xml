@@ -136,6 +136,17 @@
             <!--在引用时请在maven中央仓库搜索最新版本号-->
             <version>2.0.2</version>
         </dependency>
+        <!--模板引擎-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!--Hutool是一个小而全的Java工具类库-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.3.6</version>
+        </dependency>
     </dependencies>
 
     <build>

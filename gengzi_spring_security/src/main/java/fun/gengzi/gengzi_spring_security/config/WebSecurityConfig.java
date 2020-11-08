@@ -1,25 +1,22 @@
 package fun.gengzi.gengzi_spring_security.config;
 
 import fun.gengzi.gengzi_spring_security.constant.IgnoringUrlConstant;
-import fun.gengzi.gengzi_spring_security.service.impl.UserDetailsServiceImpl;
+import fun.gengzi.gengzi_spring_security.filter.ValidateCodeFilter;
 import fun.gengzi.gengzi_spring_security.utils.HttpResponseUtils;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
@@ -60,6 +57,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
     // ------------  会话相关配置 end -------------
 
+    @Autowired
+    private ValidateCodeFilter validateCodeFilter;
 
     /**
      * 安全过滤器链配置方法
@@ -81,12 +80,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // 自定义表单认证方式
-        http.authorizeRequests()
+        http.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
                 // 放行swagger-ui相关的路径
                 .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
+                .antMatchers(IgnoringUrlConstant.IGNORING_STATIC_URLS).permitAll()
+                .antMatchers("/getLoginCode").permitAll()
                 .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
-                .anyRequest().authenticated().and().formLogin().loginProcessingUrl("/login").and()
-                .httpBasic().and()// and 作为中断上一个属性的配置分隔
+
+                .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
                 .csrf().disable()// csrf 防止跨站脚本攻击
                 .formLogin()
                 .successHandler((httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法

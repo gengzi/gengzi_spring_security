@@ -20,6 +20,7 @@ public enum RspCodeEnum {
     FAILURE(1000, "failure"),
     NOT_ACCESS(403,"无权限"),
     ACCOUNT_NOT_EXIST(5001,"ACCOUNT_NOT_EXIST"),
+    ERROR_VALIDCODE(5002,"ERROR_VALIDCODE"),
     NOTOKEN(5000, "no token");
 
 

@@ -7,6 +7,7 @@ import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 @Controller
 @AllArgsConstructor
 @Api(tags = "验证码")
+@Slf4j
 public class CaptchaController {
 
     @Autowired
@@ -40,6 +42,7 @@ public class CaptchaController {
         //定义图形验证码的长、宽、验证码字符数、干扰线宽度
         ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(200, 100, 4, 4);
         String verificationCode = captcha.getCode();
+        log.info("verificationCode:{}", verificationCode);
         // 存入redis中
         redisUtil.set(String.format(RedisKeyContants.VALIDCODEKEY, code), verificationCode, 180);
         //图形验证码写出，可以写出到文件，也可以写出到流

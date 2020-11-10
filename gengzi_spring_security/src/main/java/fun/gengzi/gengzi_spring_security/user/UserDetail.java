@@ -33,10 +33,6 @@ public class UserDetail implements UserDetails {
     private Integer status;
     private Integer superAdmin;
     /**
-     * 部门数据权限
-     */
-    private List<Long> deptIdList;
-    /**
      * 帐户是否过期
      */
     private boolean isAccountNonExpired = true;

@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.RoleHierarchyVoter;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -73,6 +74,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    /**
+     * 密码模式需要
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception{
+        return super.authenticationManager();
+    }
+
+
 
     /**
      * 安全过滤器链配置方法
@@ -99,6 +110,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 放行swagger-ui相关的路径
                 .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
                 .antMatchers(IgnoringUrlConstant.IGNORING_STATIC_URLS).permitAll()
+                .antMatchers(IgnoringUrlConstant.OAUTH2_URLS).permitAll()
                 .antMatchers("/getLoginCode").permitAll()
                 .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
 

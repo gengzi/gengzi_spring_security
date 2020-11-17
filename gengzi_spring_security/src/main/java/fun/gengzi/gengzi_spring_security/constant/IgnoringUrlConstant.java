@@ -24,4 +24,8 @@ public class IgnoringUrlConstant {
     public static final String[] IGNORING_STATIC_URLS = {
             "/js/**"
     };
+
+    public static final String[] OAUTH2_URLS = {
+//            "/login/oauth2/code/github/**"
+    };
 }

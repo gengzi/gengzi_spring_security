@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -23,7 +24,7 @@ import java.util.HashMap;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReturnData {
+public class ReturnData implements Serializable {
 
     //操作状态码
     @ApiModelProperty(value = "状态码")

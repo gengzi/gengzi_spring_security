@@ -36,7 +36,14 @@ spring:
     store-type: redis
     timeout:
       seconds: 900
-#  security:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: e1015c0a10dc5e11b718
+            client-secret: b2e6d5530ca3f2b54abe18c78c095b30889c838b
+
 #    user:
 #      name: user
 #      password: 111

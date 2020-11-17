@@ -12,6 +12,7 @@ public class IgnoringUrlConstant {
      * 不进行认证的URL
      */
     public static final String[] IGNORING_URLS = {
+            "/api/v1/oauth/**",
             "/swagger-ui.html",
             "/actuator/**",
             "/v2/api-docs",

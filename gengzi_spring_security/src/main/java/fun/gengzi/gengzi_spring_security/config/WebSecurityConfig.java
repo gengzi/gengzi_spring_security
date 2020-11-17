@@ -113,7 +113,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(IgnoringUrlConstant.OAUTH2_URLS).permitAll()
                 .antMatchers("/getLoginCode").permitAll()
                 .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
-
                 .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
                 .csrf().disable()// csrf 防止跨站脚本攻击
                 .formLogin()

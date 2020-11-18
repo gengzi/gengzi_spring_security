@@ -2,6 +2,7 @@ package fun.gengzi.gengzi_spring_security.config;
 
 import fun.gengzi.gengzi_spring_security.constant.IgnoringUrlConstant;
 import fun.gengzi.gengzi_spring_security.filter.ValidateCodeFilter;
+import fun.gengzi.gengzi_spring_security.oauth2.HeardTokenOAuth2AuthorizationRequestRepository;
 import fun.gengzi.gengzi_spring_security.utils.HttpResponseUtils;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.server.WebSessionServerOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * <h1>security 配置</h1>
@@ -67,7 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // 定义层次角色
     @Bean
-    public RoleHierarchy roleHierarchy(){
+    public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
 //        roleHierarchy.setHierarchy();
         return roleHierarchy;
@@ -79,10 +90,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception{
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManager();
     }
 
+    @Autowired
+    private HeardTokenOAuth2AuthorizationRequestRepository auth2AuthorizationRequestRepository;
 
 
     /**
@@ -105,29 +118,60 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // 自定义表单认证方式
-        http.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                // 放行swagger-ui相关的路径
-                .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
-                .antMatchers(IgnoringUrlConstant.IGNORING_STATIC_URLS).permitAll()
-                .antMatchers(IgnoringUrlConstant.OAUTH2_URLS).permitAll()
-                .antMatchers("/getLoginCode").permitAll()
-                .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
-                .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
-                .csrf().disable()// csrf 防止跨站脚本攻击
-                .formLogin()
-                .successHandler((httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法
-                    // 成功登录所要做的操作
-                    final ReturnData ret = ReturnData.newInstance();
-                    ret.setSuccess();
-                    ret.setMessage("登陆成功");
-                    ret.setInfo(authentication);
-                    HttpResponseUtils.responseResult(httpServletResponse, ret);
-                }).and()
-                .sessionManagement((sessionManagement) -> sessionManagement
-                        .maximumSessions(100)
-                        .sessionRegistry(sessionRegistry()));
+//        http.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+//                .authorizeRequests()
+//                // 放行swagger-ui相关的路径
+//                .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
+//                .antMatchers(IgnoringUrlConstant.IGNORING_STATIC_URLS).permitAll()
+//                .antMatchers(IgnoringUrlConstant.OAUTH2_URLS).permitAll()
+//                .antMatchers("/getLoginCode").permitAll()
+//                .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
+//                .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
+//                .csrf().disable()// csrf 防止跨站脚本攻击
+//                .formLogin()
+//                .successHandler((httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法
+//                    // 成功登录所要做的操作
+//                    final ReturnData ret = ReturnData.newInstance();
+//                    ret.setSuccess();
+//                    ret.setMessage("登陆成功");
+//                    ret.setInfo(authentication);
+//                    HttpResponseUtils.responseResult(httpServletResponse, ret);
+//                }).and()
+//                .sessionManagement((sessionManagement) -> sessionManagement
+//                        .maximumSessions(100)
+//                        .sessionRegistry(sessionRegistry()));
+
+//        http.oauth2Login().loginPage("/login.html");
+
+//        http.oauth2Login(oauth2LoginCustomizer -> {
+//            oauth2LoginCustomizer.authorizationEndpoint(authorizationEndpointConfig -> {
+//                authorizationEndpointConfig.authorizationRequestRepository(this.authorizationRequestRepository());
+//            });
+//        });
+
+//        http.sessionManagement((sessionManagement) -> sessionManagement
+//                .maximumSessions(100)
+//                .sessionRegistry(sessionRegistry()));
+
+//        http.oauth2Login().authorizedClientRepository(this.authorizedClientRepository())
+//                .authorizationEndpoint().authorizationRequestRepository(this.authorizationRequestRepository()).and();
+
+                http.oauth2Login().authorizedClientRepository(this.authorizedClientRepository());
+//        http.oauth2Login();
     }
+
+
+
+    @Bean
+    public OAuth2AuthorizedClientRepository authorizedClientRepository() {
+        return new HttpSessionOAuth2AuthorizedClientRepository();
+    }
+
+//
+//    @Bean
+//    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+//        return new HttpSessionOAuth2AuthorizationRequestRepository();
+//    }
 
     /**
      * 认证管理器配置方法

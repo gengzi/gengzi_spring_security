@@ -76,5 +76,10 @@ public class RedissonSpringDataConfig extends AbstractHttpSessionApplicationInit
         return HeaderHttpSessionIdResolver.authenticationInfo();
     }
 
+//    @Bean
+//    public HttpSessionEventPublisher httpSessionEventPublisher() {
+//        return new HttpSessionEventPublisher();
+//    }
+
 
 }

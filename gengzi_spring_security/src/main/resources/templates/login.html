@@ -120,17 +120,19 @@
 
         // github登陆
         function github_login() {
-            $.ajax({
-                type: 'GET',
-                url: "/githublogin",
-                timeout: 50000, //超时时间设置，单位毫秒
-                contentType: 'application/x-www-form-urlencoded; charset=utf-8',
-                success: function (data) {
-                    validateImgObject.src = data;
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                }
-            });
+            window.location.href = "/oauth2/authorization/github";
+            // $.ajax({
+            //     type: 'GET',
+            //     // url: "/api/v1/oauth/login?oauthSysCode=GITHUB_LOGIN_URL",
+            //     url: "/oauth2/authorization/github",
+            //     timeout: 50000, //超时时间设置，单位毫秒
+            //     contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            //     success: function (data) {
+            //         validateImgObject.src = data;
+            //     },
+            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //     }
+            // });
         }
 
 

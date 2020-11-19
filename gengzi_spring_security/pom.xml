@@ -205,6 +205,18 @@
 <!--            <artifactId>spring-security-config</artifactId>-->
 <!--        </dependency>-->
 
+        <dependency>
+            <groupId>me.zhyd.oauth</groupId>
+            <artifactId>JustAuth</artifactId>
+            <version>1.15.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-http</artifactId>
+            <version>5.3.9</version>
+        </dependency>
+
 
 
     </dependencies>

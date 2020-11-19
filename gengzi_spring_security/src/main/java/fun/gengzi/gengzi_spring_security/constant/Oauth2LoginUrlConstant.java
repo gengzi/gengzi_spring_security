@@ -18,10 +18,15 @@ public class Oauth2LoginUrlConstant {
     // github oauth 授权的地址 ，参见官方文档：https://docs.github.com/en/free-pro-team@latest/developers/apps/authorizing-oauth-apps
     public static final String GITHUB_LOGIN_URL = "https://github.com/login/oauth/authorize";
 
+    public static final Integer LOGIN_SUCCESS = 2000;
+
 
     // 登陆code 和 登陆地址的映射
     public static final Map<String, String> OAUTHLOGINMAP = ImmutableMap.<String, String>builder()
             .put("GITHUB_LOGIN_URL", GITHUB_LOGIN_URL)
             .build();
+
+
+
 
 }

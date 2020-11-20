@@ -75,13 +75,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private ValidateCodeFilter validateCodeFilter;
 
 
-    // 定义层次角色
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-//        roleHierarchy.setHierarchy();
-        return roleHierarchy;
-    }
+//    // 定义层次角色
+//    @Bean
+//    public RoleHierarchy roleHierarchy() {
+//        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+////        roleHierarchy.setHierarchy();
+//        return roleHierarchy;
+//    }
 
 
     /**
@@ -92,6 +92,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManager();
     }
+
+    @Autowired
+    private OtherSysOauth2LoginAuthenticationSecurityConfig otherSysOauth2LoginAuthenticationSecurityConfig;
 
 
     /**
@@ -114,7 +117,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // 自定义表单认证方式
-        http.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+        http.apply(otherSysOauth2LoginAuthenticationSecurityConfig).and().
+                addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 // 放行swagger-ui相关的路径
                 .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()

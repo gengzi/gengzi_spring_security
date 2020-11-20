@@ -53,23 +53,23 @@ public class RedissonSpringDataConfig extends AbstractHttpSessionApplicationInit
         return Redisson.create(config);
     }
 
-    /**
-     * 自定义RedisSerializer
-     *
-     * @return
-     */
-    @Bean
-    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
-        // 返回您的Redis序列化器实现
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        // 解决查询缓存转换异常的问题
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
-        return jackson2JsonRedisSerializer;
-    }
+//    /**
+//     * 自定义RedisSerializer
+//     *
+//     * @return
+//     */
+//    @Bean
+//    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
+//        // 返回您的Redis序列化器实现
+//        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+//        // 解决查询缓存转换异常的问题
+//        ObjectMapper om = new ObjectMapper();
+//        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
+//                ObjectMapper.DefaultTyping.NON_FINAL);
+//        jackson2JsonRedisSerializer.setObjectMapper(om);
+//        return jackson2JsonRedisSerializer;
+//    }
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {

@@ -1,7 +1,10 @@
 package fun.gengzi.gengzi_spring_security.filter;
 
 import cn.hutool.core.lang.UUID;
+import fun.gengzi.gengzi_spring_security.constant.RedisKeysConstant;
 import fun.gengzi.gengzi_spring_security.constant.RspCodeEnum;
+import fun.gengzi.gengzi_spring_security.sys.entity.OtherSysUser;
+import fun.gengzi.gengzi_spring_security.sys.service.OtherUsersService;
 import fun.gengzi.gengzi_spring_security.sys.service.UsersService;
 import fun.gengzi.gengzi_spring_security.token.OtherSysOauth2LoginAuthenticationToken;
 import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
@@ -59,6 +62,16 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
 
     private RedisUtil redisUtil;
 
+    private OtherUsersService otherUsersService;
+
+    public OtherUsersService getOtherUsersService() {
+        return otherUsersService;
+    }
+
+    public void setOtherUsersService(OtherUsersService otherUsersService) {
+        this.otherUsersService = otherUsersService;
+    }
+
     public RedisUtil getRedisUtil() {
         return redisUtil;
     }
@@ -107,16 +120,17 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
             AuthUser data = authResponse.getData();
             // 用户id
             String id = data.getUuid();
-            ReturnData returnData = this.getUsersService().loadUserByUsername(String.valueOf(id));
-            if (returnData.getStatus() == RspCodeEnum.NOTOKEN.getCode()) {
+
+            OtherSysUser otherSysUser = this.getOtherUsersService().getOtherSysUserByUUIDAndScope("github", id);
+            if(otherSysUser == null){
                 String uuid = UUID.randomUUID().toString();
-                redisUtil.set("github_token:" + uuid, id);
-                response.addHeader("token", uuid);
+                redisUtil.set(RedisKeysConstant.OTHER_SYS_USER_INFO + uuid, data,300);
+                // 绑定页面
                 response.sendRedirect("/oauthlogin.html?token="+uuid);
                 return null;
-            } else {
+            }else {
+                ReturnData returnData = this.getUsersService().loadUserByUsername(otherSysUser.getUsername());
                 token = new OtherSysOauth2LoginAuthenticationToken(returnData.getInfo());
-
             }
         }
         this.setDetails(request, token);

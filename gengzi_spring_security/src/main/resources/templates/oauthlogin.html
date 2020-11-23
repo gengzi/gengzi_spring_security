@@ -74,17 +74,31 @@
 </head>
 <body>
 <div id="login">
-    <h1>请填写账号绑定github账号，并登陆系统</h1>
-    <form method="post" action="/api/v1/oauth/bind">
+    <h1>绑定账号</h1>
+    <form method="post" action="/otherlogin">
         <input type="hidden" name="scope" value="github">
-        <!--        <input type="text" required="required" placeholder="用户名" name="username"></input>-->
+        <input type="hidden" name="token" id="token" value="">
+        <input type="text" required="required" placeholder="用户名" name="username"></input>
         <input type="password" required="required" placeholder="密码" name="password"></input>
-        <button class="but" type="submit">绑定</button>
+        <button class="but" type="submit">绑定并登陆账户</button>
     </form>
 </div>
 </body>
 
 <script>
+
+    $(function () {
+        // 获取路径中的参数
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        var token = getUrlParms("token");
+        $("#token").val(token);
+    });
 
 </script>
 

@@ -1,9 +1,10 @@
 package fun.gengzi.gengzi_spring_security.filter;
 
+import cn.hutool.core.lang.UUID;
 import fun.gengzi.gengzi_spring_security.constant.RspCodeEnum;
-import fun.gengzi.gengzi_spring_security.sys.entity.GitHubData;
 import fun.gengzi.gengzi_spring_security.sys.service.UsersService;
 import fun.gengzi.gengzi_spring_security.token.OtherSysOauth2LoginAuthenticationToken;
+import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.config.AuthConfig;
@@ -12,16 +13,12 @@ import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthGithubRequest;
 import me.zhyd.oauth.request.AuthRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,18 +28,22 @@ import java.io.IOException;
 /**
  * <h1>扩展第三方登陆认证过滤器</h1>
  * <p>
- * 替代  UsernamePasswordAuthenticationFilter 过滤器，第三方认证的操作，都执行该过滤器操作
+ * 替代  UsernamePasswordAuthenticationFilter 过滤器功能，第三方认证的操作，都执行该过滤器操作
+ * 参考:UsernamePasswordAuthenticationFilter 实现
  */
 @Slf4j
 //@Service
 public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-
+    // 拦截路径，触发该filter 的执行
     private static final String REDIRECTURI = "/api/v1/oauth/callback";
+
+    // github 的认证必备参数
     @Value("${spring.security.oauth2.client.registration.github.client-id}")
     private String clientId;
     @Value("${spring.security.oauth2.client.registration.github.client-secret}")
     private String clientSecret;
+
     private UsersService usersService;
 
     public UsersService getUsersService() {
@@ -56,6 +57,19 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
     private boolean postOnly = true;
 
 
+    private RedisUtil redisUtil;
+
+    public RedisUtil getRedisUtil() {
+        return redisUtil;
+    }
+
+    public void setRedisUtil(RedisUtil redisUtil) {
+        this.redisUtil = redisUtil;
+    }
+
+    /**
+     * 初始化拦截路径
+     */
     public OtherSysOauth2LoginFilter() {
         super(new AntPathRequestMatcher(REDIRECTURI));
     }
@@ -95,7 +109,10 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
             String id = data.getUuid();
             ReturnData returnData = this.getUsersService().loadUserByUsername(String.valueOf(id));
             if (returnData.getStatus() == RspCodeEnum.NOTOKEN.getCode()) {
-                response.sendRedirect("/oauthlogin.html");
+                String uuid = UUID.randomUUID().toString();
+                redisUtil.set("github_token:" + uuid, id);
+                response.addHeader("token", uuid);
+                response.sendRedirect("/oauthlogin.html?token="+uuid);
                 return null;
             } else {
                 token = new OtherSysOauth2LoginAuthenticationToken(returnData.getInfo());

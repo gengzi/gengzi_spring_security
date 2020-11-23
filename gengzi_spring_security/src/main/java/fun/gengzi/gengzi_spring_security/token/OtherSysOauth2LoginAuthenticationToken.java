@@ -5,7 +5,16 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-
+/**
+ *  <h1>第三方登陆认证令牌</h1>
+ *
+ *  参考： UsernamePasswordAuthenticationToken 实现
+ *
+ *  将登录信息构造一个成认证令牌，传递数据
+ *
+ *
+ *
+ */
 public class OtherSysOauth2LoginAuthenticationToken extends AbstractAuthenticationToken {
 
     private final Object principal;

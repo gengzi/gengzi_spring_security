@@ -2,11 +2,9 @@
 package fun.gengzi.gengzi_spring_security.provider;
 
 import fun.gengzi.gengzi_spring_security.service.impl.OtherSysOauth2LoginUserDetailsServiceImpl;
-import fun.gengzi.gengzi_spring_security.sys.entity.GitHubData;
 import fun.gengzi.gengzi_spring_security.token.OtherSysOauth2LoginAuthenticationToken;
 import fun.gengzi.gengzi_spring_security.user.UserDetail;
 import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.model.AuthUser;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -21,6 +19,15 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.security.core.userdetails.cache.NullUserCache;
 import org.springframework.util.Assert;
 
+/**
+ * <h1>第三方登陆的提供者</h1>
+ *
+ * 参考：AbstractUserDetailsAuthenticationProvider 实现
+ *
+ *
+ *
+ *
+ */
 @Slf4j
 public class OtherSysOauth2LoginProvider implements AuthenticationProvider, InitializingBean, MessageSourceAware {
 

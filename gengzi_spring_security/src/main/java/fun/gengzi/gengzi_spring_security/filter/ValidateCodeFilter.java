@@ -18,7 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 验证码过滤器
+ * <h1>验证码过滤器</h1>
+ *
+ * @author gengzi
  */
 @AllArgsConstructor
 @Component
@@ -55,6 +57,7 @@ public class ValidateCodeFilter extends OncePerRequestFilter {
         boolean flag = false;
         if (validCode.equals(validCodeByRedis)) {
             flag = true;
+            redisUtil.del(String.format(RedisKeyContants.VALIDCODEKEY, uuid));
         }
 
         if (!flag) {

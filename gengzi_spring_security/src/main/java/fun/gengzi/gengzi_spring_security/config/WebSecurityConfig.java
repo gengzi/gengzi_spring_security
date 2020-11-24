@@ -73,25 +73,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
     // ------------  会话相关配置 end -------------
 
+    // ------------ 验证码过滤器 -------------
     @Autowired
     private ValidateCodeFilter validateCodeFilter;
 
-
+    // ------------ 用户认证失败处理程序 -------------
     @Autowired
     private UserAuthenticationFailureHandler userAuthenticationFailureHandler;
 
+    // ------------ 用户认证成功处理程序 -------------
     @Autowired
     private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
 
-
-//    // 定义层次角色
-//    @Bean
-//    public RoleHierarchy roleHierarchy() {
-//        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-////        roleHierarchy.setHierarchy();
-//        return roleHierarchy;
-//    }
-
+    // ------------ 第三方登陆的认证安全配置 -------------
+    @Autowired
+    private OtherSysOauth2LoginAuthenticationSecurityConfig otherSysOauth2LoginAuthenticationSecurityConfig;
 
     /**
      * 密码模式需要
@@ -102,8 +98,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 
-    @Autowired
-    private OtherSysOauth2LoginAuthenticationSecurityConfig otherSysOauth2LoginAuthenticationSecurityConfig;
+
 
 
     /**
@@ -186,6 +181,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(HttpMethod.OPTIONS);
     }
+
+
+    //    // 定义层次角色
+//    @Bean
+//    public RoleHierarchy roleHierarchy() {
+//        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+////        roleHierarchy.setHierarchy();
+//        return roleHierarchy;
+//    }
 
 //    /**
 //     * 认证方式：httpBasic

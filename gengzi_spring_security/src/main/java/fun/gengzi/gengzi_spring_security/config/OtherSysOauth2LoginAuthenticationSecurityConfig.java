@@ -2,6 +2,8 @@ package fun.gengzi.gengzi_spring_security.config;
 
 import fun.gengzi.gengzi_spring_security.filter.OtherSysOauth2LoginFilter;
 import fun.gengzi.gengzi_spring_security.filter.UserBindFilter;
+import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationFailureHandler;
+import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationSuccessHandler;
 import fun.gengzi.gengzi_spring_security.provider.OtherSysOauth2LoginProvider;
 import fun.gengzi.gengzi_spring_security.service.impl.OtherSysOauth2LoginUserDetailsServiceImpl;
 import fun.gengzi.gengzi_spring_security.sys.dao.OtherSysUserDao;
@@ -37,23 +39,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * <p>
  * 用户过滤器配置
  *
- *
- *
- *
  * @author gengzi
  * @date 2020年11月24日10:52:39
- *
- *
  */
 @Configuration
 public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     @Autowired
     private OtherSysOauth2LoginUserDetailsServiceImpl extendUserDetailsService;
-//    @Autowired
-//    private AuthenticationSuccessHandler successHandler;
-//    @Autowired
-//    private AuthenticationFailureHandler failureHandler;
+    // ------------ 用户认证失败处理程序 -------------
+    @Autowired
+    private UserAuthenticationFailureHandler userAuthenticationFailureHandler;
+
+    // ------------ 用户认证成功处理程序 -------------
+    @Autowired
+    private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
 
     @Autowired
     private UsersService usersService;
@@ -78,18 +78,8 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
         filter.setUsersService(usersService);
         filter.setRedisUtil(redisUtil);
         filter.setOtherUsersService(otherUsersService);
-
-        filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
-            // 返回当前登录的用户信息
-
-        });
-
-        filter.setAuthenticationFailureHandler((request, response, exception) -> {
-            // 返回认证失败的原因
-
-        });
-
-
+        filter.setAuthenticationSuccessHandler(userAuthenticationSuccessHandler);
+        filter.setAuthenticationFailureHandler(userAuthenticationFailureHandler);
         OtherSysOauth2LoginProvider provider = new OtherSysOauth2LoginProvider();
         provider.setUserDetailsService(extendUserDetailsService);
         builder.authenticationProvider(provider).addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);

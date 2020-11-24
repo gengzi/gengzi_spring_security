@@ -1,8 +1,7 @@
 package fun.gengzi.gengzi_spring_security.filter;
 
 import cn.hutool.core.lang.UUID;
-import fun.gengzi.gengzi_spring_security.constant.RedisKeysConstant;
-import fun.gengzi.gengzi_spring_security.constant.RspCodeEnum;
+import fun.gengzi.gengzi_spring_security.constant.Oauth2LoginRedisKeysConstant;
 import fun.gengzi.gengzi_spring_security.sys.entity.OtherSysUser;
 import fun.gengzi.gengzi_spring_security.sys.service.OtherUsersService;
 import fun.gengzi.gengzi_spring_security.sys.service.UsersService;
@@ -18,6 +17,7 @@ import me.zhyd.oauth.request.AuthGithubRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * <h1>扩展第三方登陆认证过滤器</h1>
@@ -38,14 +39,10 @@ import java.io.IOException;
 //@Service
 public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-    // 拦截路径，触发该filter 的执行
-    private static final String REDIRECTURI = "/api/v1/oauth/callback";
+    private static final String sys_source[] = {"github", "qq"};
 
-    // github 的认证必备参数
-    @Value("${spring.security.oauth2.client.registration.github.client-id}")
-    private String clientId;
-    @Value("${spring.security.oauth2.client.registration.github.client-secret}")
-    private String clientSecret;
+    // 拦截路径，触发该filter 的执行
+    private static final String REDIRECTURI = "/api/v1/oauth/callback/**";
 
     private UsersService usersService;
 
@@ -109,11 +106,16 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         OtherSysOauth2LoginAuthenticationToken token = null;
-//        if (postOnly && !request.getMethod().equals("POST")) {
-//            throw new AuthenticationServiceException(
-//                    "第三方认证登陆不支持: " + request.getMethod());
-//        }
-        AuthRequest authRequest = this.getAuthRequest();
+
+        String path = request.getServletPath();
+        String[] sysArr = path.split("/api/v1/oauth/callback/");
+        String sys = sysArr[sysArr.length - 1];
+        boolean contains = Arrays.asList(sys_source).contains(sys);
+        if (!contains) {
+            throw new AuthenticationServiceException(
+                    "暂不支持此系统登录（This system login is not currently supported）");
+        }
+        AuthRequest authRequest = this.getAuthRequest(sys);
         AuthResponse<AuthUser> authResponse = authRequest.login(this.getCallback(request));
         if (authResponse.ok()) {
             // 获取第三方登陆信息成功
@@ -124,7 +126,7 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
             OtherSysUser otherSysUser = this.getOtherUsersService().getOtherSysUserByUUIDAndScope("github", id);
             if (otherSysUser == null) {
                 String uuid = UUID.randomUUID().toString();
-                redisUtil.set(RedisKeysConstant.OTHER_SYS_USER_INFO + uuid, data, 300);
+                redisUtil.set(Oauth2LoginRedisKeysConstant.OTHER_SYS_USER_INFO + uuid, data, 300);
                 // 绑定页面
                 response.sendRedirect("/oauthlogin.html?token=" + uuid);
                 return null;
@@ -164,9 +166,10 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
     /**
      * 构造认证请求
      *
+     * @param sys 系统来源
      * @return
      */
-    private AuthRequest getAuthRequest() {
+    private AuthRequest getAuthRequest(String sys) {
         return new AuthGithubRequest(AuthConfig.builder()
                 .clientId("e1015c0a10dc5e11b718")
                 .clientSecret("72e50f683c91861107320cddfdb2948c134b3c52")

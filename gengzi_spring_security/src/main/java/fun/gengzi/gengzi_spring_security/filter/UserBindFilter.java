@@ -1,6 +1,6 @@
 package fun.gengzi.gengzi_spring_security.filter;
 
-import fun.gengzi.gengzi_spring_security.constant.RedisKeysConstant;
+import fun.gengzi.gengzi_spring_security.constant.Oauth2LoginRedisKeysConstant;
 import fun.gengzi.gengzi_spring_security.sys.dao.OtherSysUserDao;
 import fun.gengzi.gengzi_spring_security.sys.dao.SysUsersDao;
 import fun.gengzi.gengzi_spring_security.sys.entity.OtherSysUser;
@@ -136,7 +136,7 @@ public class UserBindFilter extends
                     "token 参数缺失（The token parameter is missing）");
         }
 
-        AuthUser authUser = (AuthUser) this.getRedisUtil().get(RedisKeysConstant.OTHER_SYS_USER_INFO + token);
+        AuthUser authUser = (AuthUser) this.getRedisUtil().get(Oauth2LoginRedisKeysConstant.OTHER_SYS_USER_INFO + token);
         if (authUser == null) {
             throw new AuthenticationServiceException(
                     "绑定超时，请重新登陆绑定（Binding timed out, please log in again to bind）");

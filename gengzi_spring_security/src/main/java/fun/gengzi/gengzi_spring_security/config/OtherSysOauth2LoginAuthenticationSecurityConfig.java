@@ -32,6 +32,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 设置登陆失败事件
  * <p>
  * 将提供提供者和过滤器加入 HttpSecurity 中，并在 UsernamePasswordAuthenticationFilter 前执行逻辑判断
+ *
+ *
+ * <p>
+ * 用户过滤器配置
+ *
+ *
+ *
+ *
+ * @author gengzi
+ * @date 2020年11月24日10:52:39
+ *
+ *
  */
 @Configuration
 public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
@@ -60,15 +72,28 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
 
     @Override
     public void configure(HttpSecurity builder) throws Exception {
+        // 第三方登陆过滤器
         OtherSysOauth2LoginFilter filter = new OtherSysOauth2LoginFilter();
         filter.setAuthenticationManager(builder.getSharedObject(AuthenticationManager.class));
         filter.setUsersService(usersService);
         filter.setRedisUtil(redisUtil);
         filter.setOtherUsersService(otherUsersService);
+
+        filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
+            // 返回当前登录的用户信息
+
+        });
+
+        filter.setAuthenticationFailureHandler((request, response, exception) -> {
+            // 返回认证失败的原因
+
+        });
+
+
         OtherSysOauth2LoginProvider provider = new OtherSysOauth2LoginProvider();
         provider.setUserDetailsService(extendUserDetailsService);
         builder.authenticationProvider(provider).addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
-
+        // 绑定用户Filter
         UserBindFilter userBindFilter = new UserBindFilter();
         userBindFilter.setAuthenticationManager(builder.getSharedObject(AuthenticationManager.class));
         userBindFilter.setRedisUtil(redisUtil);

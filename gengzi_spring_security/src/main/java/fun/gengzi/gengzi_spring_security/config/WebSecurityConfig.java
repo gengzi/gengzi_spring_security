@@ -2,6 +2,8 @@ package fun.gengzi.gengzi_spring_security.config;
 
 import fun.gengzi.gengzi_spring_security.constant.IgnoringUrlConstant;
 import fun.gengzi.gengzi_spring_security.filter.ValidateCodeFilter;
+import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationFailureHandler;
+import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationSuccessHandler;
 import fun.gengzi.gengzi_spring_security.utils.HttpResponseUtils;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +77,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private ValidateCodeFilter validateCodeFilter;
 
 
+    @Autowired
+    private UserAuthenticationFailureHandler userAuthenticationFailureHandler;
+
+    @Autowired
+    private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
+
+
 //    // 定义层次角色
 //    @Bean
 //    public RoleHierarchy roleHierarchy() {
@@ -129,14 +138,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
                 .csrf().disable()// csrf 防止跨站脚本攻击
                 .formLogin()
-                .successHandler((httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法
-                    // 成功登录所要做的操作
-                    final ReturnData ret = ReturnData.newInstance();
-                    ret.setSuccess();
-                    ret.setMessage("登陆成功");
-                    ret.setInfo(authentication);
-                    HttpResponseUtils.responseResult(httpServletResponse, ret);
-                }).and()
+                .successHandler(userAuthenticationSuccessHandler)
+                .failureHandler(userAuthenticationFailureHandler).and()
                 .sessionManagement((sessionManagement) -> sessionManagement
                         .maximumSessions(100)
                         .sessionRegistry(sessionRegistry()));
@@ -240,4 +243,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .sessionManagement().invalidSessionStrategy(new MyInvalidSessionStrategy()) // session失效后的策略
 //                .and().sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry()); // 使用 spring session 提供的会话注册表
 //    }
+
+    /**
+     * (httpServletRequest, httpServletResponse, authentication) -> {  // 成功登录的处理方法
+     *                     // 成功登录所要做的操作
+     *                     final ReturnData ret = ReturnData.newInstance();
+     *                     ret.setSuccess();
+     *                     ret.setMessage("登陆成功");
+     *                     ret.setInfo(authentication);
+     *                     HttpResponseUtils.responseResult(httpServletResponse, ret);
+     *                 }
+     */
 }
+
+

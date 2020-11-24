@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Api(value = "UsersController", tags = {"UsersController"})
 @Controller
 @RequestMapping("/api/v1/user")
@@ -30,7 +32,7 @@ public class UsersController {
     @PreAuthorize("hasAuthority('sys:manager:qry')")
     @GetMapping("/infoByUserName")
     @ResponseBody
-    public ReturnData getMyPrizeInfo(@RequestParam("username") String username) {
+    public ReturnData getMyPrizeInfo(@RequestParam("username") String username, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         ReturnData ret = ReturnData.newInstance();
         SysUsers sysUsers = sysUsersDao.findByUsername(username);

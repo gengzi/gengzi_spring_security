@@ -29,6 +29,16 @@ import java.io.IOException;
 /**
  * <h1>redisson 配置</h1>
  *
+ * 主要配置：
+ * 0， 管理 httpsession 的配置，过期时间等
+ * 1， 配置 redisson 的连接
+ * 2， 配置 sessionid 的解析器，通过请求头中的sessionid来匹配 session 信息
+ * 3， 配置 Redis key和value的序列化方式，注意，如果使用Jackson2JsonRedisSerializer 需要将 spring session 升级至 5.3 版本，否则会出现解析报错
+ *
+ *
+ *
+ *
+ *
  * @author gengzi
  * @date 2020年11月3日14:59:45
  * <p>
@@ -71,6 +81,12 @@ public class RedissonSpringDataConfig extends AbstractHttpSessionApplicationInit
 //        return jackson2JsonRedisSerializer;
 //    }
 
+    /**
+     * httpsessionid 解析器
+     * 可以对比 cookie session 的形式，现在把 cookie 中存储 sessionid 。变成了请求头中存储的 token
+     *
+     * @return
+     */
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
         return HeaderHttpSessionIdResolver.authenticationInfo();

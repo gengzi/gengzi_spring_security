@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2018 人人开源 All rights reserved.
- * <p>
- * https://www.renren.io
- * <p>
- * 版权所有，侵权必究！
- */
-
 package fun.gengzi.gengzi_spring_security.config;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * <h1>密码的加密方式</h1>
+ *
+ * @author gengzi
+ * @date 2020年11月24日10:53:14
  */
 @Configuration
 @AllArgsConstructor

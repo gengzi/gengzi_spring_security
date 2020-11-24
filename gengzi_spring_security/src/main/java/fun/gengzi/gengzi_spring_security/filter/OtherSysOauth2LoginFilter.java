@@ -122,13 +122,13 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
             String id = data.getUuid();
 
             OtherSysUser otherSysUser = this.getOtherUsersService().getOtherSysUserByUUIDAndScope("github", id);
-            if(otherSysUser == null){
+            if (otherSysUser == null) {
                 String uuid = UUID.randomUUID().toString();
-                redisUtil.set(RedisKeysConstant.OTHER_SYS_USER_INFO + uuid, data,300);
+                redisUtil.set(RedisKeysConstant.OTHER_SYS_USER_INFO + uuid, data, 300);
                 // 绑定页面
-                response.sendRedirect("/oauthlogin.html?token="+uuid);
+                response.sendRedirect("/oauthlogin.html?token=" + uuid);
                 return null;
-            }else {
+            } else {
                 ReturnData returnData = this.getUsersService().loadUserByUsername(otherSysUser.getUsername());
                 token = new OtherSysOauth2LoginAuthenticationToken(returnData.getInfo());
             }

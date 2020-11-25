@@ -1,9 +1,10 @@
 package fun.gengzi.gengzi_spring_security.config;
 
 import fun.gengzi.gengzi_spring_security.constant.IgnoringUrlConstant;
-import fun.gengzi.gengzi_spring_security.filter.ValidateCodeFilter;
+import fun.gengzi.gengzi_spring_security.detail.CaptchaWebAuthenticationDetailsSource;
 import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationFailureHandler;
 import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationSuccessHandler;
+import fun.gengzi.gengzi_spring_security.provider.CaptchaProvider;
 import fun.gengzi.gengzi_spring_security.utils.HttpResponseUtils;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +75,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // ------------  会话相关配置 end -------------
 
     // ------------ 验证码过滤器 -------------
-    @Autowired
-    private ValidateCodeFilter validateCodeFilter;
+//    @Autowired
+//    private ValidateCodeFilter validateCodeFilter;
 
     // ------------ 用户认证失败处理程序 -------------
     @Autowired
@@ -97,6 +98,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManager();
     }
+
+    @Autowired
+    private CaptchaWebAuthenticationDetailsSource captchaWebAuthenticationDetailsSource;
+
+    @Autowired
+    private CaptchaProvider captchaProvider;
 
 
 
@@ -121,8 +128,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // 自定义表单认证方式
-        http.apply(otherSysOauth2LoginAuthenticationSecurityConfig).and().
-                addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+        http.apply(otherSysOauth2LoginAuthenticationSecurityConfig).and()
                 .authorizeRequests()
                 // 放行swagger-ui相关的路径
                 .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
@@ -133,6 +139,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
                 .csrf().disable()// csrf 防止跨站脚本攻击
                 .formLogin()
+                .authenticationDetailsSource(captchaWebAuthenticationDetailsSource)
                 .successHandler(userAuthenticationSuccessHandler)
                 .failureHandler(userAuthenticationFailureHandler).and()
                 .sessionManagement((sessionManagement) -> sessionManagement
@@ -167,6 +174,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
+        auth.authenticationProvider(captchaProvider);
     }
 
     /**

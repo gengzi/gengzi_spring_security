@@ -67,73 +67,98 @@
     <script type="text/javascript" src="/js/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-    <div id="login">
-        <h1>登陆</h1>
-        <form method="post" action="/login">
-            <input type="hidden"  id="uuid" name="uuid"></input>
-            <input type="text" required="required" placeholder="用户名" name="username"></input>
-            <input type="password" required="required" placeholder="密码" name="password"></input>
-            <div>
-                <input style="width: 160px;display: inline-block" type="text" required="required" placeholder="验证码" name="validCode"></input>
-                <img id="yz_img" src="#" style="display: inline-block;width: 100px;height: 40px;margin: -14px auto;" onClick="flushValidateCode();" >
-            </div>
-            <button class="but" type="submit">登录</button>
-        </form>
-        <button class="but" id="github_btn"   onClick="github_login();" type="button">github授权登陆</button>
-    </div>
+<div id="login">
+    <h1>登陆</h1>
+    <form method="post" action="/login">
+        <input type="hidden"  id="uuid" name="uuid"></input>
+        <input type="text" required="required" placeholder="用户名" name="username"></input>
+        <input type="password" required="required" placeholder="密码" name="password"></input>
+        <div>
+            <input style="width: 160px;display: inline-block" type="text" required="required" placeholder="验证码" name="validCode"></input>
+            <img id="yz_img" src="#" style="display: inline-block;width: 100px;height: 40px;margin: -14px auto;" onClick="flushValidateCode();" >
+        </div>
+        <p class="info">提示信息</p>
+        <button class="but" type="submit">登录</button>
+    </form>
+    <button class="but" id="github_btn"   onClick="github_login();" type="button">github授权登陆</button>
+</div>
 </body>
 
 <script>
-        function uuid() {
-            var s = [];
-            var hexDigits = "0123456789abcdef";
-            for (var i = 0; i < 36; i++) {
-                s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    function uuid() {
+        var s = [];
+        var hexDigits = "0123456789abcdef";
+        for (var i = 0; i < 36; i++) {
+            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        s[8] = s[13] = s[18] = s[23] = "-";
+
+        var uuid = s.join("");
+        return uuid;
+    }
+
+    /* 刷新图片验证码 */
+    function flushValidateCode() {
+        var validateImgObject = document.getElementById("yz_img");
+        codeBydate = uuid();
+        $("#uuid").val(codeBydate);
+        $.ajax({
+            type: 'GET',
+            url: "/getLoginCode?code=" + codeBydate,
+            timeout: 50000, //超时时间设置，单位毫秒
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            success: function (data) {
+                validateImgObject.src = data;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
             }
-            s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
-            s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-            s[8] = s[13] = s[18] = s[23] = "-";
+        });
+    }
+    //进入页面就刷新生成验证码
+    flushValidateCode();
 
-            var uuid = s.join("");
-            return uuid;
-        }
+    // github登陆
+    function github_login() {
+        // window.location.href = "/oauth2/authorization/github";
+        window.location.href = "/api/v1/oauth/login?oauthSysCode=github";
+        // $.ajax({
+        //     type: 'GET',
+        //     url: "/githublogin",
+        //     timeout: 50000, //超时时间设置，单位毫秒
+        //     contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+        //     success: function (data) {
+        //         validateImgObject.src = data;
+        //     },
+        //     error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //     }
+        // });
+    }
 
-        /* 刷新图片验证码 */
-        function flushValidateCode() {
-            var validateImgObject = document.getElementById("yz_img");
-            codeBydate = uuid();
-            $("#uuid").val(codeBydate);
-            $.ajax({
-                type: 'GET',
-                url: "/getLoginCode?code=" + codeBydate,
-                timeout: 50000, //超时时间设置，单位毫秒
-                contentType: 'application/x-www-form-urlencoded; charset=utf-8',
-                success: function (data) {
-                    validateImgObject.src = data;
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                }
-            });
-        }
-        //进入页面就刷新生成验证码
-        flushValidateCode();
 
-        // github登陆
-        function github_login() {
-            // window.location.href = "/oauth2/authorization/github";
-            window.location.href = "/api/v1/oauth/login?oauthSysCode=github";
-            // $.ajax({
-            //     type: 'GET',
-            //     url: "/githublogin",
-            //     timeout: 50000, //超时时间设置，单位毫秒
-            //     contentType: 'application/x-www-form-urlencoded; charset=utf-8',
-            //     success: function (data) {
-            //         validateImgObject.src = data;
-            //     },
-            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
-            //     }
-            // });
-        }
+
+
+    // function login() {
+    //
+    //     $.ajax({
+    //         type: 'POST',
+    //         url: "/login",
+    //         timeout: 50000, //超时时间设置，单位毫秒
+    //         contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+    //         data:{"uuid":""},
+    //         // uuid: c112c0df-0a5a-49bc-a60e-cd8a9db7eef6
+    //         // username: admin
+    //         // password: 111
+    //         // validCode: fdsf
+    //         success: function (data) {
+    //
+    //         },
+    //         error: function (XMLHttpRequest, textStatus, errorThrown) {
+    //         }
+    //     });
+    //
+    // }
 
 
 

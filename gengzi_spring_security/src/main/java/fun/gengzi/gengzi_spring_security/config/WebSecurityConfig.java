@@ -106,8 +106,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private CaptchaProvider captchaProvider;
 
 
-
-
     /**
      * 安全过滤器链配置方法
      * 针对http请求的安全配置
@@ -139,7 +137,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
                 .csrf().disable()// csrf 防止跨站脚本攻击
                 .formLogin()
-                .authenticationDetailsSource(captchaWebAuthenticationDetailsSource)
+                .authenticationDetailsSource(captchaWebAuthenticationDetailsSource)  // 替换原有的authenticationDetailsSource
                 .successHandler(userAuthenticationSuccessHandler)
                 .failureHandler(userAuthenticationFailureHandler).and()
                 .sessionManagement((sessionManagement) -> sessionManagement
@@ -174,6 +172,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
+        // 增加认证提供者
         auth.authenticationProvider(captchaProvider);
     }
 

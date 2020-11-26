@@ -77,6 +77,7 @@
                 <input style="width: 160px;display: inline-block" type="text" required="required" placeholder="验证码" name="validCode"></input>
                 <img id="yz_img" src="#" style="display: inline-block;width: 100px;height: 40px;margin: -14px auto;" onClick="flushValidateCode();" >
             </div>
+            <p class="info">提示信息</p>
             <button class="but" type="submit">登录</button>
         </form>
         <button class="but" id="github_btn"   onClick="github_login();" type="button">github授权登陆</button>
@@ -134,6 +135,30 @@
             //     }
             // });
         }
+
+
+
+
+        // function login() {
+        //
+        //     $.ajax({
+        //         type: 'POST',
+        //         url: "/login",
+        //         timeout: 50000, //超时时间设置，单位毫秒
+        //         contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+        //         data:{"uuid":""},
+        //         // uuid: c112c0df-0a5a-49bc-a60e-cd8a9db7eef6
+        //         // username: admin
+        //         // password: 111
+        //         // validCode: fdsf
+        //         success: function (data) {
+        //
+        //         },
+        //         error: function (XMLHttpRequest, textStatus, errorThrown) {
+        //         }
+        //     });
+        //
+        // }
 
 
 

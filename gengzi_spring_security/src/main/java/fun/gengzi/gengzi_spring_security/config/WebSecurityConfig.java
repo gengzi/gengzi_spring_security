@@ -15,6 +15,8 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.RoleHierarchyVoter;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -103,7 +105,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private CaptchaWebAuthenticationDetailsSource captchaWebAuthenticationDetailsSource;
 
     @Autowired
-    private CaptchaProvider captchaProvider;
+    private AuthenticationProvider authenticationProvider;
 
 
     /**
@@ -171,9 +173,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
-        // 增加认证提供者
-        auth.authenticationProvider(captchaProvider);
+//        auth.userDetailsService(userDetailsService);
+//        // 增加认证提供者
+        // 设置 userDetailsService 和  authenticationProvider 都会创建一个 Provider。 如果仅需要一个，请只设置一个
+        auth.authenticationProvider(authenticationProvider);
+
+
     }
 
     /**

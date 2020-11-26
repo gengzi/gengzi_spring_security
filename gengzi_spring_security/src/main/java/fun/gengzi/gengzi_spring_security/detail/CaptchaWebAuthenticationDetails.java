@@ -33,6 +33,8 @@ public class CaptchaWebAuthenticationDetails extends WebAuthenticationDetails {
         super(request);
         this.setRedisUtil(redisUtil);
         validate(request);
+        // 这里设置了 redisUtil 会导致序列化 springsecuritycontext 时，包含 redisUtil 这个类，这个类不能被序列化，所以用完就干掉
+        this.setRedisUtil(null);
 
     }
 

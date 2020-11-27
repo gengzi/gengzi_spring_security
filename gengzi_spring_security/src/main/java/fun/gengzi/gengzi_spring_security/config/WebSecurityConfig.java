@@ -177,8 +177,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        // 增加认证提供者
         // 设置 userDetailsService 和  authenticationProvider 都会创建一个 Provider。 如果仅需要一个，请只设置一个
         auth.authenticationProvider(authenticationProvider);
-
-
     }
 
     /**

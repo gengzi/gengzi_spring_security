@@ -15,6 +15,21 @@ import org.springframework.stereotype.Component;
 
 /**
  * <h1>验证码认证提供者</h1>
+ * <p>
+ * 重写 additionalAuthenticationChecks 方法，增加图片验证码的校验判断
+ * 成功，执行父类校验，走原有流程
+ * 失败，抛出异常，告知用户验证码错误
+ *
+ * 该类需要在核心配置中配置，以便于替换原有的 AuthenticationProvider
+ * 代码示例：
+ *       @Autowired
+ *       private AuthenticationProvider authenticationProvider;
+ *          protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+ *         // 设置 userDetailsService 和  authenticationProvider 都会创建一个 Provider。 如果仅需要一个，请只设置一个
+ *         auth.authenticationProvider(authenticationProvider);
+ *     }
+ *
+ *
  *
  * @author gengzi
  * @date 2020年11月26日13:51:32
@@ -36,6 +51,7 @@ public class CaptchaProvider extends DaoAuthenticationProvider {
 
     /**
      * 验证码验证是否正确
+     *
      * @param userDetails
      * @param authentication
      * @throws AuthenticationException

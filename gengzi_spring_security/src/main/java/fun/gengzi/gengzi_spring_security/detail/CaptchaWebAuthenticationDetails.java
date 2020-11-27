@@ -6,12 +6,42 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * <h1>验证码Web身份验证详细信息</h1>
+ * <p>
+ * 扩展WebAuthenticationDetails 的参数，增加 flag 参数。
+ * <p>
+ * flag 参数用来判断 验证码是否正确的标识 true 正确，false 不正确
+ *
+ * @author gengzi
+ * @date 2020年11月27日15:34:38
+ */
 public class CaptchaWebAuthenticationDetails extends WebAuthenticationDetails {
 
     private RedisUtil redisUtil;
 
     // 验证码是否正确
     boolean flag = false;
+
+    public CaptchaWebAuthenticationDetails(HttpServletRequest request, RedisUtil redisUtil) {
+        super(request);
+        this.setRedisUtil(redisUtil);
+        validate(request);
+        // 这里设置了 redisUtil 会导致序列化 springsecuritycontext 时，包含 redisUtil 这个类，这个类不能被序列化，所以用完就干掉
+        this.setRedisUtil(null);
+
+    }
+
+    private void validate(HttpServletRequest request) {
+        String uuid = request.getParameter("uuid");
+        String validCode = request.getParameter("validCode");
+        // 校验一下随机验证码
+        String validCodeByRedis = (String) redisUtil.get(String.format(RedisKeyContants.VALIDCODEKEY, uuid));
+        if (validCode.equals(validCodeByRedis)) {
+            flag = true;
+            redisUtil.del(String.format(RedisKeyContants.VALIDCODEKEY, uuid));
+        }
+    }
 
     public RedisUtil getRedisUtil() {
         return redisUtil;
@@ -27,26 +57,5 @@ public class CaptchaWebAuthenticationDetails extends WebAuthenticationDetails {
 
     public void setFlag(boolean flag) {
         this.flag = flag;
-    }
-
-    public CaptchaWebAuthenticationDetails(HttpServletRequest request,RedisUtil redisUtil) {
-        super(request);
-        this.setRedisUtil(redisUtil);
-        validate(request);
-        // 这里设置了 redisUtil 会导致序列化 springsecuritycontext 时，包含 redisUtil 这个类，这个类不能被序列化，所以用完就干掉
-        this.setRedisUtil(null);
-
-    }
-
-    private void validate(HttpServletRequest request) {
-        String uuid = request.getParameter("uuid");
-        String validCode = request.getParameter("validCode");
-
-        // 校验一下随机验证码
-        String validCodeByRedis = (String) redisUtil.get(String.format(RedisKeyContants.VALIDCODEKEY, uuid));
-        if (validCode.equals(validCodeByRedis)) {
-            flag = true;
-            redisUtil.del(String.format(RedisKeyContants.VALIDCODEKEY, uuid));
-        }
     }
 }

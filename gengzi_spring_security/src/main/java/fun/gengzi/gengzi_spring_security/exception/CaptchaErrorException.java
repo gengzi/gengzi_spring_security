@@ -10,6 +10,6 @@ import org.springframework.security.core.AuthenticationException;
  */
 public class CaptchaErrorException extends AuthenticationException {
     public CaptchaErrorException(String msg) {
-        super("图形验证码错误");
+        super("验证码输入错误");
     }
 }

@@ -8,6 +8,7 @@ import fun.gengzi.gengzi_spring_security.provider.OtherSysOauth2LoginProvider;
 import fun.gengzi.gengzi_spring_security.service.impl.OtherSysOauth2LoginUserDetailsServiceImpl;
 import fun.gengzi.gengzi_spring_security.sys.dao.OtherSysUserDao;
 import fun.gengzi.gengzi_spring_security.sys.dao.SysUsersDao;
+import fun.gengzi.gengzi_spring_security.sys.service.AuthRequestService;
 import fun.gengzi.gengzi_spring_security.sys.service.OtherUsersService;
 import fun.gengzi.gengzi_spring_security.sys.service.UsersService;
 import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
@@ -70,6 +71,9 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
     @Autowired
     private OtherUsersService otherUsersService;
 
+    @Autowired
+    private AuthRequestService authRequestService;
+
     @Override
     public void configure(HttpSecurity builder) throws Exception {
         // 第三方登陆过滤器
@@ -80,6 +84,7 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
         filter.setOtherUsersService(otherUsersService);
         filter.setAuthenticationSuccessHandler(userAuthenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(userAuthenticationFailureHandler);
+        filter.setAuthRequestService(authRequestService);
         OtherSysOauth2LoginProvider provider = new OtherSysOauth2LoginProvider();
         provider.setUserDetailsService(extendUserDetailsService);
         builder.authenticationProvider(provider).addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
@@ -89,6 +94,8 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
         userBindFilter.setRedisUtil(redisUtil);
         userBindFilter.setOtherSysUserDao(otherSysUserDao);
         userBindFilter.setSysUsersDao(sysUsersDao);
+        userBindFilter.setAuthenticationFailureHandler(userAuthenticationFailureHandler);
+        userBindFilter.setAuthenticationSuccessHandler(userAuthenticationSuccessHandler);
         builder.addFilterBefore(userBindFilter, UsernamePasswordAuthenticationFilter.class);
 
     }

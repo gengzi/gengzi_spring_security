@@ -2,6 +2,7 @@ package fun.gengzi.gengzi_spring_security.sys.service.impl;
 
 import fun.gengzi.gengzi_spring_security.sys.service.AuthRequestService;
 import me.zhyd.oauth.config.AuthConfig;
+import me.zhyd.oauth.request.AuthGiteeRequest;
 import me.zhyd.oauth.request.AuthGithubRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +12,20 @@ import org.springframework.stereotype.Service;
 public class AuthRequestServiceImpl implements AuthRequestService {
 
     // github 的认证必备参数
-    @Value("${spring.security.oauth2.client.registration.github.client-id}")
+    @Value("${oauth2.github.client-id}")
     private String githubClientId;
-    @Value("${spring.security.oauth2.client.registration.github.client-secret}")
+    @Value("${oauth2.github.client-secret}")
     private String githubClientSecret;
-    private String redirectUri;
+    @Value("${oauth2.github.redirectUri}")
+    private String githubRedirectUri;
+
+    @Value("${oauth2.gitee.client-id}")
+    private String giteeClientId;
+    @Value("${oauth2.gitee.client-secret}")
+    private String giteeClientSecret;
+    @Value("${oauth2.gitee.redirectUri}")
+    private String giteeRedirectUri;
+
 
     @Override
     public AuthRequest getAuthRequest(String sys) {
@@ -25,12 +35,18 @@ public class AuthRequestServiceImpl implements AuthRequestService {
                 authRequest = new AuthGithubRequest(AuthConfig.builder()
                         .clientId(githubClientId)
                         .clientSecret(githubClientSecret)
-                        .redirectUri("http://localhost:8081/api/v1/oauth/callback")
+                        .redirectUri(githubRedirectUri)
                         .build());
                 break;
-            case "qq":
+            case "gitee":
+                authRequest = new AuthGiteeRequest(AuthConfig.builder()
+                        .clientId(giteeClientId)
+                        .clientSecret(giteeClientSecret)
+                        .redirectUri(giteeRedirectUri)
+                        .build());
                 break;
             default:
+                authRequest = null;
                 break;
         }
         return authRequest;

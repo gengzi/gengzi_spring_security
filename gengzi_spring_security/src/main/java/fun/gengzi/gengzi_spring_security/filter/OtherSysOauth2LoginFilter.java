@@ -3,6 +3,7 @@ package fun.gengzi.gengzi_spring_security.filter;
 import cn.hutool.core.lang.UUID;
 import fun.gengzi.gengzi_spring_security.constant.Oauth2LoginRedisKeysConstant;
 import fun.gengzi.gengzi_spring_security.sys.entity.OtherSysUser;
+import fun.gengzi.gengzi_spring_security.sys.service.AuthRequestService;
 import fun.gengzi.gengzi_spring_security.sys.service.OtherUsersService;
 import fun.gengzi.gengzi_spring_security.sys.service.UsersService;
 import fun.gengzi.gengzi_spring_security.token.OtherSysOauth2LoginAuthenticationToken;
@@ -39,7 +40,7 @@ import java.util.Arrays;
 //@Service
 public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final String sys_source[] = {"github", "qq"};
+    private static final String sys_source[] = {"github", "gitee"};
 
     // 拦截路径，触发该filter 的执行
     private static final String REDIRECTURI = "/api/v1/oauth/callback/**";
@@ -60,6 +61,16 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
     private RedisUtil redisUtil;
 
     private OtherUsersService otherUsersService;
+
+    private AuthRequestService authRequestService;
+
+    public AuthRequestService getAuthRequestService() {
+        return authRequestService;
+    }
+
+    public void setAuthRequestService(AuthRequestService authRequestService) {
+        this.authRequestService = authRequestService;
+    }
 
     public OtherUsersService getOtherUsersService() {
         return otherUsersService;
@@ -116,6 +127,10 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
                     "暂不支持此系统登录（This system login is not currently supported）");
         }
         AuthRequest authRequest = this.getAuthRequest(sys);
+        if (authRequest == null) {
+            throw new AuthenticationServiceException(
+                    "暂不支持此系统登录（This system login is not currently supported）");
+        }
         AuthResponse<AuthUser> authResponse = authRequest.login(this.getCallback(request));
         if (authResponse.ok()) {
             // 获取第三方登陆信息成功
@@ -123,12 +138,12 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
             // 用户id
             String id = data.getUuid();
 
-            OtherSysUser otherSysUser = this.getOtherUsersService().getOtherSysUserByUUIDAndScope("github", id);
+            OtherSysUser otherSysUser = this.getOtherUsersService().getOtherSysUserByUUIDAndScope(sys, id);
             if (otherSysUser == null) {
                 String uuid = UUID.randomUUID().toString();
                 redisUtil.set(Oauth2LoginRedisKeysConstant.OTHER_SYS_USER_INFO + uuid, data, 300);
                 // 绑定页面
-                response.sendRedirect("/oauthlogin.html?token=" + uuid);
+                response.sendRedirect("/oauthlogin.html?token=" + uuid + "&scope=" + sys);
                 return null;
             } else {
                 ReturnData returnData = this.getUsersService().loadUserByUsername(otherSysUser.getUsername());
@@ -170,11 +185,7 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
      * @return
      */
     private AuthRequest getAuthRequest(String sys) {
-        return new AuthGithubRequest(AuthConfig.builder()
-                .clientId("e1015c0a10dc5e11b718")
-                .clientSecret("72e50f683c91861107320cddfdb2948c134b3c52")
-                .redirectUri("http://localhost:8081/api/v1/oauth/callback")
-                .build());
+        return authRequestService.getAuthRequest(sys);
     }
 
     protected void setDetails(HttpServletRequest request, OtherSysOauth2LoginAuthenticationToken token) {

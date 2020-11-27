@@ -79,7 +79,8 @@
             </div>
             <button class="but" type="submit">登录</button>
         </form>
-        <button class="but" id="github_btn"   onClick="github_login();" type="button">github授权登陆</button>
+        <button class="but" onClick="other_login('github');" type="button">github授权登陆</button>
+        <button class="but" onClick="other_login('gitee');" type="button">gitee授权登陆</button>
     </div>
 </body>
 
@@ -119,9 +120,9 @@
         flushValidateCode();
 
         // github登陆
-        function github_login() {
+        function other_login(sys) {
             // window.location.href = "/oauth2/authorization/github";
-            window.location.href = "/api/v1/oauth/login?oauthSysCode=github";
+            window.location.href = "/api/v1/oauth/login?oauthSysCode="+sys;
             // $.ajax({
             //     type: 'GET',
             //     url: "/githublogin",

@@ -55,10 +55,12 @@ public class UserBindFilter extends
     public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "username";
     public static final String SPRING_SECURITY_FORM_PASSWORD_KEY = "password";
     public static final String SPRING_SECURITY_FORM_TOKEN_KEY = "token";
+    public static final String SPRING_SECURITY_FORM_SCOPE_KEY = "scope";
 
     private String usernameParameter = SPRING_SECURITY_FORM_USERNAME_KEY;
     private String passwordParameter = SPRING_SECURITY_FORM_PASSWORD_KEY;
     private String tokenParameter = SPRING_SECURITY_FORM_TOKEN_KEY;
+    private String scopeParameter = SPRING_SECURITY_FORM_SCOPE_KEY;
     private boolean postOnly = true;
 
     private RedisUtil redisUtil;
@@ -121,6 +123,8 @@ public class UserBindFilter extends
         String username = obtainUsername(request);
         String password = obtainPassword(request);
         String token = obtainToken(request);
+        String sys = obtainScope(request);
+
 
 
         if (username == null) {
@@ -153,7 +157,7 @@ public class UserBindFilter extends
         // 用户姓名
         String uuid = authUser.getUuid();
         OtherSysUser otherSysUser = new OtherSysUser();
-        otherSysUser.setScope("github");
+        otherSysUser.setScope(sys);
         otherSysUser.setUuid(uuid);
         otherSysUser.setCreateTime(new Date());
         otherSysUser.setUserId(sysUser.getId());
@@ -188,6 +192,12 @@ public class UserBindFilter extends
     @Nullable
     protected String obtainToken(HttpServletRequest request) {
         return request.getParameter(tokenParameter);
+    }
+
+    // 获取scope
+    @Nullable
+    protected String obtainScope(HttpServletRequest request) {
+        return request.getParameter(scopeParameter);
     }
 
     protected void setDetails(HttpServletRequest request,

@@ -10,6 +10,7 @@ import fun.gengzi.gengzi_spring_security.constant.RspCodeEnum;
 import fun.gengzi.gengzi_spring_security.sys.dao.SysUsersDao;
 import fun.gengzi.gengzi_spring_security.sys.entity.GitHubData;
 import fun.gengzi.gengzi_spring_security.sys.entity.SysUsers;
+import fun.gengzi.gengzi_spring_security.sys.service.AuthRequestService;
 import fun.gengzi.gengzi_spring_security.sys.service.UsersService;
 import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
@@ -43,10 +44,7 @@ import java.util.HashMap;
 @RequestMapping("/api/v1/oauth")
 public class Oauth2LoginController {
 
-    @Value("${spring.security.oauth2.client.registration.github.client-id}")
-    private String clientId;
-    @Value("${spring.security.oauth2.client.registration.github.client-secret}")
-    private String clientSecret;
+
     @Autowired
     private UsersService usersService;
 
@@ -59,6 +57,9 @@ public class Oauth2LoginController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthRequestService authRequestService;
+
     @ApiOperation(value = "github login", notes = "github login")
     @ApiImplicitParams({@ApiImplicitParam(name = "oauthSysCode", value = "oauthSysCode", required = true)})
     @GetMapping("/login")
@@ -68,48 +69,40 @@ public class Oauth2LoginController {
 //            return "/";
 //        }
 //        String url = Oauth2LoginUrlConstant.OAUTHLOGINMAP.get(oauthSysCode);
-        AuthRequest authRequest = getAuthRequest();
+        AuthRequest authRequest = authRequestService.getAuthRequest(oauthSysCode);
         return "redirect:" + authRequest.authorize(AuthStateUtils.createState());
     }
 
-    /**
-     * https://zhuanlan.zhihu.com/p/144670329
-     *
-     * @param callback
-     * @return
-     */
-    @RequestMapping("/callback")
-    public Object login(AuthCallback callback) {
-        // 判断系统是否存在该用户信息
-        // 存在，直接登陆
-        // 不存在，跳转到绑定页面，要求用户绑定
+//    /**
+//     * https://zhuanlan.zhihu.com/p/144670329
+//     *
+//     * @param callback
+//     * @return
+//     */
+//    @RequestMapping("/callback")
+//    public Object login(AuthCallback callback) {
+//        // 判断系统是否存在该用户信息
+//        // 存在，直接登陆
+//        // 不存在，跳转到绑定页面，要求用户绑定
+//
+//        AuthRequest authRequest = getAuthRequest();
+//        AuthResponse<GitHubData> authResponse = authRequest.login(callback);
+//        if (authResponse.getCode() == Oauth2LoginUrlConstant.LOGIN_SUCCESS) {
+//            GitHubData data = authResponse.getData();
+//            // 用户id
+//            long id = data.getRawUserInfo().getId();
+//            ReturnData returnData = usersService.loadUserByUsername(String.valueOf(id));
+//            if (returnData.getStatus() == RspCodeEnum.NOTOKEN.getCode()) {
+//                return "oauthlogin.html";
+//            } else {
+//
+//            }
+//
+//
+//        }
+//        return "error";
+//    }
 
-        AuthRequest authRequest = getAuthRequest();
-        AuthResponse<GitHubData> authResponse = authRequest.login(callback);
-        if (authResponse.getCode() == Oauth2LoginUrlConstant.LOGIN_SUCCESS) {
-            GitHubData data = authResponse.getData();
-            // 用户id
-            long id = data.getRawUserInfo().getId();
-            ReturnData returnData = usersService.loadUserByUsername(String.valueOf(id));
-            if (returnData.getStatus() == RspCodeEnum.NOTOKEN.getCode()) {
-                return "oauthlogin.html";
-            } else {
-
-            }
-
-
-        }
-        return "error";
-    }
-
-
-    private AuthRequest getAuthRequest() {
-        return new AuthGithubRequest(AuthConfig.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .redirectUri("http://localhost:8081/api/v1/oauth/callback")  // /api/v1/oauth/callback
-                .build());
-    }
 
     @ApiOperation(value = "bind", notes = "bind")
     @ApiImplicitParams({@ApiImplicitParam(name = "scope", value = "scope", required = true),

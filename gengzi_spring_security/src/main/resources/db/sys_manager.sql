@@ -2,18 +2,37 @@
 Navicat MySQL Data Transfer
 
 Source Server         : localhost
-Source Server Version : 50720
+Source Server Version : 50548
 Source Host           : localhost:3306
 Source Database       : sys_manager
 
 Target Server Type    : MYSQL
-Target Server Version : 50720
+Target Server Version : 50548
 File Encoding         : 65001
 
-Date: 2020-11-05 15:30:30
+Date: 2020-11-28 18:51:24
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for other_sys_user
+-- ----------------------------
+DROP TABLE IF EXISTS `other_sys_user`;
+CREATE TABLE `other_sys_user` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `scope` varchar(64) DEFAULT NULL COMMENT '第三方系统',
+  `uuid` varchar(64) DEFAULT NULL COMMENT '第三方系统唯一账户',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '关联系统用户表的id',
+  `username` varchar(64) DEFAULT NULL COMMENT '登陆用户名',
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of other_sys_user
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for role_permission
@@ -27,7 +46,7 @@ CREATE TABLE `role_permission` (
   KEY `idx_role_id` (`role_id`),
   KEY `idx_permission_id` (`permission_id`),
   KEY `idex_role_id_permission_Id` (`role_id`,`permission_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42746 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of role_permission
@@ -52,15 +71,15 @@ CREATE TABLE `sys_permission` (
   `icon` varchar(50) DEFAULT NULL COMMENT '菜单图标',
   `status` tinyint(4) DEFAULT NULL COMMENT '状态',
   `remark` varchar(500) DEFAULT NULL COMMENT '说明',
-  `create_date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_date` datetime DEFAULT NULL COMMENT '创建时间',
   `creator` varchar(100) DEFAULT NULL COMMENT '创建者',
-  `update_date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_date` datetime DEFAULT NULL COMMENT '更新时间',
   `updater` varchar(100) DEFAULT NULL COMMENT '更新人',
   PRIMARY KEY (`id`),
   UNIQUE KEY `px_id` (`id`) USING BTREE,
   KEY `idx_pid` (`pid`),
   KEY `idx_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=310584 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of sys_permission
@@ -81,18 +100,18 @@ CREATE TABLE `sys_role` (
   `sort` int(10) DEFAULT NULL COMMENT '排序',
   `del_flag` tinyint(4) DEFAULT NULL COMMENT '删除标识  0：未删除    1：删除',
   `creator` varchar(100) DEFAULT NULL COMMENT '创建者',
-  `create_date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_date` datetime DEFAULT NULL COMMENT '创建时间',
   `updater` varchar(100) DEFAULT NULL,
-  `update_date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `update_date` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `pk_id` (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=7138 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
 INSERT INTO `sys_role` VALUES ('1', '管理员', 'admin', '管理员', '1', '0', 'admin', '2020-11-05 09:52:50', null, '2020-11-05 09:52:50');
-INSERT INTO `sys_role` VALUES ('2', '测试用户', 'test、', '测试', '2', '0', 'admin', '2020-11-05 10:30:35', null, null);
+INSERT INTO `sys_role` VALUES ('2', '测试用户', 'test', '测试', '2', '0', 'admin', '2020-11-05 10:30:35', null, null);
 
 -- ----------------------------
 -- Table structure for sys_users
@@ -112,7 +131,7 @@ CREATE TABLE `sys_users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_username` (`username`) USING BTREE,
   KEY `pk_id` (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10041 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of sys_users
@@ -130,7 +149,7 @@ CREATE TABLE `user_role` (
   `role_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `ur_uidandroid_index` (`user_id`,`role_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=11105 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user_role

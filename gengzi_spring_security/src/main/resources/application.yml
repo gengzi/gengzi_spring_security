@@ -37,14 +37,14 @@ spring:
     timeout:
       seconds: 900
 oauth2:
-  github:
-    client-id: e1015c0a10dc5e11b718
-    client-secret: 72e50f683c91861107320cddfdb2948c134b3c52
-    redirectUri: http://localhost:8081/api/v1/oauth/callback/github
-  gitee:
-    client-id: 8d5f66c25383612cd6556e3b6273a2cddcf143be463b43b28902ed80bb89363f
-    client-secret: 2882d5ce5db4b25c90746a85b29e49d220b3877a9b4f0263f46c5e277b4c4f5f
-    redirectUri: http://localhost:8081/api/v1/oauth/callback/gitee
-
+  othersys:
+    - name: github
+      client_id: e1015c0a10dc5e11b718
+      client_secret: 72e50f683c91861107320cddfdb2948c134b3c52
+      redirectUri: http://localhost:8081/api/v1/oauth/callback/github
+    - name: gitee
+      client_id: 8d5f66c25383612cd6556e3b6273a2cddcf143be463b43b28902ed80bb89363f
+      client_secret: 2882d5ce5db4b25c90746a85b29e49d220b3877a9b4f0263f46c5e277b4c4f5f
+      redirectUri: http://localhost:8081/api/v1/oauth/callback/gitee
 
 

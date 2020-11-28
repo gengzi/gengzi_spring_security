@@ -1,6 +1,7 @@
 package fun.gengzi.gengzi_spring_security.filter;
 
 import cn.hutool.core.lang.UUID;
+import fun.gengzi.gengzi_spring_security.constant.Oauth2LoginConstant;
 import fun.gengzi.gengzi_spring_security.constant.Oauth2LoginRedisKeysConstant;
 import fun.gengzi.gengzi_spring_security.sys.entity.OtherSysUser;
 import fun.gengzi.gengzi_spring_security.sys.service.AuthRequestService;
@@ -10,13 +11,10 @@ import fun.gengzi.gengzi_spring_security.token.OtherSysOauth2LoginAuthentication
 import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import lombok.extern.slf4j.Slf4j;
-import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
-import me.zhyd.oauth.request.AuthGithubRequest;
 import me.zhyd.oauth.request.AuthRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
@@ -40,7 +38,6 @@ import java.util.Arrays;
 //@Service
 public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final String sys_source[] = {"github", "gitee"};
 
     // 拦截路径，触发该filter 的执行
     private static final String REDIRECTURI = "/api/v1/oauth/callback/**";
@@ -121,7 +118,7 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
         String path = request.getServletPath();
         String[] sysArr = path.split("/api/v1/oauth/callback/");
         String sys = sysArr[sysArr.length - 1];
-        boolean contains = Arrays.asList(sys_source).contains(sys);
+        boolean contains = Arrays.asList(Oauth2LoginConstant.SYS_SOURCE).contains(sys);
         if (!contains) {
             throw new AuthenticationServiceException(
                     "暂不支持此系统登录（This system login is not currently supported）");

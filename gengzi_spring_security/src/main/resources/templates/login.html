@@ -19,19 +19,19 @@
         }
         #login{
             position: absolute;
-            top: 50%;
+            top: 30%;
             left:50%;
             margin: -150px 0 0 -150px;
             width: 300px;
             height: 300px;
         }
-        #login h1{
+        #login h1,h2{
             color: #fff;
             text-shadow:0 0 10px;
             letter-spacing: 1px;
             text-align: center;
         }
-        h1{
+        h1,h2{
             font-size: 2em;
             margin: 0.67em 0;
         }
@@ -75,12 +75,13 @@
             <input type="password" required="required" placeholder="密码" name="password"></input>
             <div>
                 <input style="width: 160px;display: inline-block" type="text" required="required" placeholder="验证码" name="validCode"></input>
-                <img id="yz_img" src="#" style="display: inline-block;width: 100px;height: 40px;margin: -14px auto;" onClick="flushValidateCode();" >
+                <img id="yz_img" src="#" style="display: inline-block;width: 110px;height: 40px;margin: -14px auto;" onClick="flushValidateCode();" >
             </div>
             <button class="but" type="submit">登录</button>
         </form>
-        <button class="but" onClick="other_login('github');" type="button">github授权登陆</button>
-        <button class="but" onClick="other_login('gitee');" type="button">gitee授权登陆</button>
+        <h2>其他方式登录</h2>
+        <button class="but" onClick="other_login('github');" type="button" style="margin-top:10px">github授权登陆</button>
+        <button class="but" onClick="other_login('gitee');" type="button" style="margin-top:10px" >gitee授权登陆</button>
     </div>
 </body>
 

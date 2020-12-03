@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50548
 File Encoding         : 65001
 
-Date: 2020-11-28 18:51:24
+Date: 2020-12-03 21:13:58
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -20,15 +20,16 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `other_sys_user`;
 CREATE TABLE `other_sys_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `scope` varchar(64) DEFAULT NULL COMMENT '第三方系统',
   `uuid` varchar(64) DEFAULT NULL COMMENT '第三方系统唯一账户',
   `user_id` bigint(20) DEFAULT NULL COMMENT '关联系统用户表的id',
   `username` varchar(64) DEFAULT NULL COMMENT '登陆用户名',
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `create_time` datetime DEFAULT NULL COMMENT '绑定时间（创建时间）',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`) USING BTREE COMMENT '用户id索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of other_sys_user

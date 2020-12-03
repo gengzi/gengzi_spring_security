@@ -120,21 +120,9 @@
         //进入页面就刷新生成验证码
         flushValidateCode();
 
-        // github登陆
+        // 第三方登陆
         function other_login(sys) {
-            // window.location.href = "/oauth2/authorization/github";
             window.location.href = "/api/v1/oauth/login?oauthSysCode="+sys;
-            // $.ajax({
-            //     type: 'GET',
-            //     url: "/githublogin",
-            //     timeout: 50000, //超时时间设置，单位毫秒
-            //     contentType: 'application/x-www-form-urlencoded; charset=utf-8',
-            //     success: function (data) {
-            //         validateImgObject.src = data;
-            //     },
-            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
-            //     }
-            // });
         }
 
 

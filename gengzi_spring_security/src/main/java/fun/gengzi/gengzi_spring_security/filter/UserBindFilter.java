@@ -125,8 +125,6 @@ public class UserBindFilter extends
         String token = obtainToken(request);
         String sys = obtainScope(request);
 
-
-
         if (username == null) {
             username = "";
         }
@@ -154,7 +152,7 @@ public class UserBindFilter extends
         }
 
 
-        // 用户姓名
+        // 将用户信息
         String uuid = authUser.getUuid();
         OtherSysUser otherSysUser = new OtherSysUser();
         otherSysUser.setScope(sys);

@@ -6,14 +6,14 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
 /**
- *  <h1>第三方登陆认证令牌</h1>
+ * <h1>第三方登陆认证令牌</h1>
+ * <p>
+ * 参考： UsernamePasswordAuthenticationToken 实现
+ * <p>
+ * 将登录信息构造一个成认证令牌，传递数据
  *
- *  参考： UsernamePasswordAuthenticationToken 实现
- *
- *  将登录信息构造一个成认证令牌，传递数据
- *
- *
- *
+ * @author gengzi
+ * @date 2020年12月3日21:37:24
  */
 public class OtherSysOauth2LoginAuthenticationToken extends AbstractAuthenticationToken {
 
@@ -48,16 +48,6 @@ public class OtherSysOauth2LoginAuthenticationToken extends AbstractAuthenticati
         super.setAuthenticated(true); // must use super, as we override
 
     }
-
-//    @Override
-//    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-//        if (isAuthenticated) {
-//            throw new IllegalArgumentException(
-//                    "Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
-//        }
-//        super.setAuthenticated(false);
-//    }
-
 
 
     // 密码

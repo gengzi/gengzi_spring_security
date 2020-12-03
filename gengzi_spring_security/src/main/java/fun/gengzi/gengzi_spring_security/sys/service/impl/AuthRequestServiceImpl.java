@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class AuthRequestServiceImpl implements AuthRequestService {
 
-
+    // 读取第三方登陆配置的实体类
     @Autowired
     private AuthRequestConfigEntity authRequestConfigEntity;
 
@@ -32,12 +32,13 @@ public class AuthRequestServiceImpl implements AuthRequestService {
                 filter(authRequestInfo -> authRequestInfo.getName().equalsIgnoreCase(sys))
                 .findFirst();
         AuthRequestConfigEntity.AuthRequestInfo authRequestInfo = info.orElseThrow(() -> new RrException("不存在" + sys + "该系统的第三方登陆配置，请在yml文件中加入该系统的配置", RspCodeEnum.ERROR.getCode()));
+        // 构造 AuthConfig
         AuthConfig config = AuthConfig.builder()
                 .clientId(authRequestInfo.getClientId())
                 .clientSecret(authRequestInfo.getClientSecret())
                 .redirectUri(authRequestInfo.getRedirectUri())
                 .build();
-
+        // 反射，使用有参的构造方法，创建对象
         Class aClass = Oauth2LoginConstant.sysMappingClazz.get(sys);
         Constructor constructor = aClass.getConstructor(AuthConfig.class);
         Object obj = constructor.newInstance(config);

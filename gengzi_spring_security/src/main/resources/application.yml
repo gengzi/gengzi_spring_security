@@ -43,6 +43,18 @@ spring:
           github:
             client-id: e1015c0a10dc5e11b718
             client-secret: 72e50f683c91861107320cddfdb2948c134b3c52
+            redirect-uri: "{baseUrl}/api/v1/oauth/callback/{registrationId}"
+          gitee:
+            client-id: 8d5f66c25383612cd6556e3b6273a2cddcf143be463b43b28902ed80bb89363f
+            client-secret: 2882d5ce5db4b25c90746a85b29e49d220b3877a9b4f0263f46c5e277b4c4f5f
+            authorization-grant-type: authorization_code
+            provider: gitee
+            redirect-uri: "http://localhost:8081/api/v1/oauth/callback/{registrationId}"
+        provider:
+          gitee:
+            authorization-uri: https://gitee.com/oauth/authorize
+            token-uri: https://gitee.com/oauth/token
+            user-info-uri: https://gitee.com/api/v5/user
 
 
 

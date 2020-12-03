@@ -4,6 +4,9 @@ import fun.gengzi.gengzi_spring_security.constant.IgnoringUrlConstant;
 import fun.gengzi.gengzi_spring_security.filter.ValidateCodeFilter;
 import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationFailureHandler;
 import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationSuccessHandler;
+import fun.gengzi.gengzi_spring_security.oauth2.gitee.GiteeAuth2AccessTokenReposeClient;
+import fun.gengzi.gengzi_spring_security.oauth2.gitee.GiteeUserInfo;
+import fun.gengzi.gengzi_spring_security.oauth2.gitee.GiteeUserService;
 import fun.gengzi.gengzi_spring_security.utils.HttpResponseUtils;
 import fun.gengzi.gengzi_spring_security.vo.ReturnData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +50,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Configuration
 // 启用web 认证
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 // 启用全局的方法安全
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -86,8 +89,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
 
     // ------------ 第三方登陆的认证安全配置 -------------
-    @Autowired
-    private OtherSysOauth2LoginAuthenticationSecurityConfig otherSysOauth2LoginAuthenticationSecurityConfig;
+//    @Autowired
+//    private OtherSysOauth2LoginAuthenticationSecurityConfig otherSysOauth2LoginAuthenticationSecurityConfig;
 
     /**
      * 密码模式需要
@@ -97,8 +100,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManager();
     }
-
-
 
 
     /**
@@ -120,25 +121,42 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // 自定义表单认证方式
-        http.apply(otherSysOauth2LoginAuthenticationSecurityConfig).and().
-                addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+//        // 自定义表单认证方式
+//        http.apply(otherSysOauth2LoginAuthenticationSecurityConfig).and().
+//                addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+//                .authorizeRequests()
+//                // 放行swagger-ui相关的路径
+//                .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
+//                .antMatchers(IgnoringUrlConstant.IGNORING_STATIC_URLS).permitAll()
+//                .antMatchers(IgnoringUrlConstant.OAUTH2_URLS).permitAll()
+//                .antMatchers("/getLoginCode").permitAll()
+//                .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
+//                .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
+//                .csrf().disable()// csrf 防止跨站脚本攻击
+//                .formLogin()
+//                .successHandler(userAuthenticationSuccessHandler)
+//                .failureHandler(userAuthenticationFailureHandler).and()
+//                .sessionManagement((sessionManagement) -> sessionManagement
+//                        .maximumSessions(100)
+//                        .sessionRegistry(sessionRegistry()));
+
+
+        http
                 .authorizeRequests()
                 // 放行swagger-ui相关的路径
                 .antMatchers(IgnoringUrlConstant.IGNORING_URLS).permitAll()
                 .antMatchers(IgnoringUrlConstant.IGNORING_STATIC_URLS).permitAll()
                 .antMatchers(IgnoringUrlConstant.OAUTH2_URLS).permitAll()
                 .antMatchers("/getLoginCode").permitAll()
-                .antMatchers("/codeBuildNew/**").permitAll()  // 都可以访问
-                .anyRequest().authenticated().and().formLogin().loginPage("/login.html").loginProcessingUrl("/login").permitAll().and()
-                .csrf().disable()// csrf 防止跨站脚本攻击
-                .formLogin()
-                .successHandler(userAuthenticationSuccessHandler)
-                .failureHandler(userAuthenticationFailureHandler).and()
-                .sessionManagement((sessionManagement) -> sessionManagement
-                        .maximumSessions(100)
-                        .sessionRegistry(sessionRegistry()));
+                .antMatchers("/codeBuildNew/**").permitAll();
 
+        GiteeAuth2AccessTokenReposeClient giteeAuth2AccessTokenReposeClient = new GiteeAuth2AccessTokenReposeClient();
+        GiteeUserService giteeUserService = new GiteeUserService();
+        http.oauth2Login().tokenEndpoint().accessTokenResponseClient(giteeAuth2AccessTokenReposeClient).and()
+                .userInfoEndpoint().customUserType(GiteeUserInfo.class, "gitee").userService(giteeUserService)
+                .and()
+                .redirectionEndpoint().baseUri("/api/v1/oauth/callback/*");
+        http.oauth2Login().loginPage("/login.html");
 
     }
 

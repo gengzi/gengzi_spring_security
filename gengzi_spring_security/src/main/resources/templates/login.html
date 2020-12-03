@@ -123,7 +123,8 @@
         // github登陆
         function other_login(sys) {
             // window.location.href = "/oauth2/authorization/github";
-            window.location.href = "/api/v1/oauth/login?oauthSysCode="+sys;
+            // window.location.href = "/api/v1/oauth/login?oauthSysCode="+sys;
+            window.location.href = "/oauth2/authorization/"+sys;
             // $.ajax({
             //     type: 'GET',
             //     url: "/githublogin",

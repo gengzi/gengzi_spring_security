@@ -5,16 +5,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
 /**
- *
  * gitee 用户详情
- *
  */
-public class GiteeUserInfo implements OAuth2User {
+public class GiteeUserInfo implements OAuth2User, Serializable {
 
     // 一个主体，通常是一个用户名
     private String principal;
@@ -27,6 +26,15 @@ public class GiteeUserInfo implements OAuth2User {
         this.principal = principal;
     }
 
+    private Map<String, Object> data;
+
+    public Map<String, Object> getData() {
+        return data;
+    }
+
+    public void setData(Map<String, Object> data) {
+        this.data = data;
+    }
 
     /**
      * Get the OAuth 2.0 token attributes
@@ -36,13 +44,13 @@ public class GiteeUserInfo implements OAuth2User {
      */
     @Override
     public Map<String, Object> getAttributes() {
-        return null;
+        return this.getData();
     }
 
     /**
      * Get the {@link Collection} of {@link GrantedAuthority}s associated
      * with this OAuth 2.0 token
-     *
+     * <p>
      * 获取权限集合，新用户登陆可赋值一个默认的权限
      *
      * @return the OAuth 2.0 token authorities
@@ -58,9 +66,8 @@ public class GiteeUserInfo implements OAuth2User {
 
     /**
      * Returns the name of the authenticated <code>Principal</code>. Never <code>null</code>.
-     *
+     * <p>
      * // 返回认证的 Principal
-     *
      *
      * @return the name of the authenticated <code>Principal</code>
      */

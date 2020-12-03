@@ -49,7 +49,7 @@ import java.io.IOException;
 // 启用redis管理会话
 // maxInactiveIntervalInSeconds 最大的session 失效时间（秒）
 // redisNamespace 命名空间 默认 spring:session
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 1800, redisNamespace = "gengzi:session")
+//@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 1800, redisNamespace = "gengzi:session")
 public class RedissonSpringDataConfig extends AbstractHttpSessionApplicationInitializer {
 
     @Bean
@@ -85,12 +85,12 @@ public class RedissonSpringDataConfig extends AbstractHttpSessionApplicationInit
      * httpsessionid 解析器
      * 可以对比 cookie session 的形式，现在把 cookie 中存储 sessionid 。变成了请求头中存储的 token
      *
-     * @return
-     */
-    @Bean
-    public HttpSessionIdResolver httpSessionIdResolver() {
-        return HeaderHttpSessionIdResolver.authenticationInfo();
-    }
+//     * @return
+//     */
+//    @Bean
+//    public HttpSessionIdResolver httpSessionIdResolver() {
+//        return HeaderHttpSessionIdResolver.authenticationInfo();
+//    }
 
 //    @Bean
 //    public HttpSessionEventPublisher httpSessionEventPublisher() {

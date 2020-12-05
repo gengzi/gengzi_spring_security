@@ -4,8 +4,10 @@ import fun.gengzi.gengzi_spring_security.filter.OtherSysOauth2LoginFilter;
 import fun.gengzi.gengzi_spring_security.filter.UserBindFilter;
 import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationFailureHandler;
 import fun.gengzi.gengzi_spring_security.handler.UserAuthenticationSuccessHandler;
+import fun.gengzi.gengzi_spring_security.provider.BindLoginProvider;
 import fun.gengzi.gengzi_spring_security.provider.OtherSysOauth2LoginProvider;
 import fun.gengzi.gengzi_spring_security.service.impl.OtherSysOauth2LoginUserDetailsServiceImpl;
+import fun.gengzi.gengzi_spring_security.service.impl.UserDetailsServiceImpl;
 import fun.gengzi.gengzi_spring_security.sys.dao.OtherSysUserDao;
 import fun.gengzi.gengzi_spring_security.sys.dao.SysUsersDao;
 import fun.gengzi.gengzi_spring_security.sys.service.AuthRequestService;
@@ -17,6 +19,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -74,6 +78,12 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
     @Autowired
     private AuthRequestService authRequestService;
 
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public void configure(HttpSecurity builder) throws Exception {
         // 第三方登陆过滤器
@@ -96,7 +106,11 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
         userBindFilter.setSysUsersDao(sysUsersDao);
         userBindFilter.setAuthenticationFailureHandler(userAuthenticationFailureHandler);
         userBindFilter.setAuthenticationSuccessHandler(userAuthenticationSuccessHandler);
-        builder.addFilterBefore(userBindFilter, UsernamePasswordAuthenticationFilter.class);
+        BindLoginProvider bindLoginProvider = new BindLoginProvider();
+        bindLoginProvider.setOtherSysUserDao(otherSysUserDao);
+        bindLoginProvider.setUserDetailsService(userDetailsService);
+        bindLoginProvider.setPasswordEncoder(passwordEncoder);
+        builder.authenticationProvider(bindLoginProvider).addFilterBefore(userBindFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 }

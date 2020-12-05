@@ -6,6 +6,7 @@ import fun.gengzi.gengzi_spring_security.sys.dao.SysUsersDao;
 import fun.gengzi.gengzi_spring_security.sys.entity.OtherSysUser;
 import fun.gengzi.gengzi_spring_security.sys.entity.SysUsers;
 import fun.gengzi.gengzi_spring_security.sys.service.OtherUsersService;
+import fun.gengzi.gengzi_spring_security.token.BindAuthenticationToken;
 import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
 import me.zhyd.oauth.model.AuthUser;
 import org.springframework.lang.Nullable;
@@ -160,18 +161,22 @@ public class UserBindFilter extends
         otherSysUser.setCreateTime(new Date());
         otherSysUser.setUserId(sysUser.getId());
         otherSysUser.setUsername(sysUser.getUsername());
-        this.getOtherSysUserDao().save(otherSysUser);
+//        this.getOtherSysUserDao().save(otherSysUser);
 
 
         username = username.trim();
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-                username, password);
+
+        BindAuthenticationToken bindAuthenticationToken = new BindAuthenticationToken(username, password,otherSysUser);
+
+//        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
+//                username, password);
 
         // Allow subclasses to set the "details" property
-        setDetails(request, authRequest);
-
-        return this.getAuthenticationManager().authenticate(authRequest);
+        setDetails(request, bindAuthenticationToken);
+        // 移除缓存的用户数据
+        this.getRedisUtil().del(Oauth2LoginRedisKeysConstant.OTHER_SYS_USER_INFO + token);
+        return this.getAuthenticationManager().authenticate(bindAuthenticationToken);
     }
 
     // 获取密码
@@ -199,7 +204,7 @@ public class UserBindFilter extends
     }
 
     protected void setDetails(HttpServletRequest request,
-                              UsernamePasswordAuthenticationToken authRequest) {
+                              BindAuthenticationToken authRequest) {
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
     }
 

@@ -1,4 +1,3 @@
-
 package fun.gengzi.gengzi_spring_security.provider;
 
 import fun.gengzi.gengzi_spring_security.service.impl.OtherSysOauth2LoginUserDetailsServiceImpl;
@@ -21,12 +20,23 @@ import org.springframework.util.Assert;
 
 /**
  * <h1>第三方登陆的提供者</h1>
+ * <p>
+ * 参考： {@link AbstractUserDetailsAuthenticationProvider} 实现
+ * 一些方法直接默认使用。
+ * 可以将AbstractUserDetailsAuthenticationProvider 整个类拷贝后，仅修改一些参数和方法
+ * <p>
+ * 作用：
+ * 判断token类型是否一致，不是OtherSysOauth2LoginAuthenticationToken ，不执行认证流程。这样将表单登陆，绑定用户登陆，还是第三方直接登录（已经绑定）
+ * 认证过程区分开。
+ * <p>
+ * 校验基本的信息后，就赋予认证成功的标识。
+ * <p>
+ * <p>
+ * 注意： 该Provider 并没有提供对密码的校验。因为第三方登陆，不会输入本系统用户名和密码。只要数据库表能找到该用户，默认该用户已经认证成功了。
+ * 如果需要真正执行密码校验的操作，请参阅{@link DaoAuthenticationProvider} 的 additionalAuthenticationChecks 方法实现。
  *
- * 参考：AbstractUserDetailsAuthenticationProvider 实现
- *
- *
- *
- *
+ * @author gengzi
+ * @date 2020年12月5日12:41:07
  */
 @Slf4j
 public class OtherSysOauth2LoginProvider implements AuthenticationProvider, InitializingBean, MessageSourceAware {
@@ -38,25 +48,22 @@ public class OtherSysOauth2LoginProvider implements AuthenticationProvider, Init
     private UserDetailsChecker preAuthenticationChecks = new DefaultPreAuthenticationChecks();
     private UserDetailsChecker postAuthenticationChecks = new DefaultPostAuthenticationChecks();
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
-
+    // 用户详情服务，用于查询用户详情信息
     private OtherSysOauth2LoginUserDetailsServiceImpl userDetailsService;
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
     }
-
 
     @Override
     public void setMessageSource(MessageSource messageSource) {
         this.messages = new MessageSourceAccessor(messageSource);
     }
 
-
     /**
-     * 认证
+     * 认证方法
      *
-     * @param authentication
+     * @param authentication {@link OtherSysOauth2LoginAuthenticationToken} token
      * @return
      * @throws AuthenticationException
      */
@@ -79,22 +86,25 @@ public class OtherSysOauth2LoginProvider implements AuthenticationProvider, Init
         } catch (AuthenticationException exception) {
             throw exception;
         }
-
         postAuthenticationChecks.check(user);
-
         if (!cacheWasUsed) {
             this.userCache.putUserInCache(user);
         }
-
         Object principalToReturn = user;
-
         if (forcePrincipalAsString) {
             principalToReturn = user.getUsername();
         }
-
         return createSuccessAuthentication(principalToReturn, authentication, user);
     }
 
+    /**
+     * 创建成功认证
+     *
+     * @param principal      主体
+     * @param authentication token
+     * @param user           用户详情
+     * @return
+     */
     protected Authentication createSuccessAuthentication(Object principal,
                                                          Authentication authentication, UserDetails user) {
         // Ensure we return the original credentials the user supplied,
@@ -109,9 +119,11 @@ public class OtherSysOauth2LoginProvider implements AuthenticationProvider, Init
     }
 
     /**
-     * 检索用户
+     * 检索用户详情
+     * <p>
+     * 从数据库中查询
      *
-     * @param username
+     * @param username       用户名
      * @param authentication
      * @return
      * @throws AuthenticationException
@@ -139,13 +151,11 @@ public class OtherSysOauth2LoginProvider implements AuthenticationProvider, Init
         return userDetailsService;
     }
 
-
     @Override
     public boolean supports(Class<?> authentication) {
         return (OtherSysOauth2LoginAuthenticationToken.class
                 .isAssignableFrom(authentication));
     }
-
 
     /**
      * 默认的预身份验证检查

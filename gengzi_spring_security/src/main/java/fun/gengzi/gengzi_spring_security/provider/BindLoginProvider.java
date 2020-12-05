@@ -1,15 +1,10 @@
 
 package fun.gengzi.gengzi_spring_security.provider;
 
-import fun.gengzi.gengzi_spring_security.constant.Oauth2LoginRedisKeysConstant;
-import fun.gengzi.gengzi_spring_security.service.impl.OtherSysOauth2LoginUserDetailsServiceImpl;
 import fun.gengzi.gengzi_spring_security.service.impl.UserDetailsServiceImpl;
 import fun.gengzi.gengzi_spring_security.sys.dao.OtherSysUserDao;
 import fun.gengzi.gengzi_spring_security.sys.entity.OtherSysUser;
 import fun.gengzi.gengzi_spring_security.token.BindAuthenticationToken;
-import fun.gengzi.gengzi_spring_security.token.OtherSysOauth2LoginAuthenticationToken;
-import fun.gengzi.gengzi_spring_security.user.UserDetail;
-import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +13,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.*;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
@@ -36,6 +30,10 @@ import org.springframework.util.Assert;
  * <h1>绑定登陆的提供者</h1>
  * <p>
  * 参考：AbstractUserDetailsAuthenticationProvider 实现
+ * <p>
+ * 作用：
+ * 1，校验用户信息，用户名和密码是否正确
+ * 2，用户信息正确，再将第三方用户信息存入数据库
  *
  * @author gengzi
  * @date 2020年12月5日10:55:59
@@ -55,9 +53,11 @@ public class BindLoginProvider implements AuthenticationProvider, InitializingBe
     private UserDetailsChecker preAuthenticationChecks = new BindLoginProvider.DefaultPreAuthenticationChecks();
     private UserDetailsChecker postAuthenticationChecks = new BindLoginProvider.DefaultPostAuthenticationChecks();
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+    // 用户详情服务
     private UserDetailsServiceImpl userDetailsService;
+    // 保存第三方用户信息的dao
     private OtherSysUserDao otherSysUserDao;
-
+    // 密码encoder
     private PasswordEncoder passwordEncoder;
 
     public PasswordEncoder getPasswordEncoder() {
@@ -164,11 +164,10 @@ public class BindLoginProvider implements AuthenticationProvider, InitializingBe
             principalToReturn = user.getUsername();
         }
 
-        // 保存第三方用户信息
+        // 增加保存第三方用户信息
         BindAuthenticationToken bind = (BindAuthenticationToken) authentication;
-        OtherSysUser bindInfo = (OtherSysUser)bind.getBindInfo();
+        OtherSysUser bindInfo = (OtherSysUser) bind.getBindInfo();
         this.getOtherSysUserDao().save(bindInfo);
-
 
         return createSuccessAuthentication(principalToReturn, authentication, user);
     }
@@ -303,7 +302,16 @@ public class BindLoginProvider implements AuthenticationProvider, InitializingBe
     }
 
 
-    @SuppressWarnings("deprecation")
+    /**
+     * 密码验证部分
+     * <p>
+     * 根据密码的加密策略，对比用户输入密码和系统中存储的密码是否一致
+     * 如果不一致，将抛出 BadCredentialsException
+     *
+     * @param userDetails
+     * @param authentication
+     * @throws AuthenticationException
+     */
     protected void additionalAuthenticationChecks(UserDetails userDetails,
                                                   BindAuthenticationToken authentication)
             throws AuthenticationException {

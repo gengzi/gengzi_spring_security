@@ -39,8 +39,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 设置登陆失败事件
  * <p>
  * 将提供提供者和过滤器加入 HttpSecurity 中，并在 UsernamePasswordAuthenticationFilter 前执行逻辑判断
- *
- *
  * <p>
  * 用户过滤器配置
  *
@@ -95,6 +93,7 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
         filter.setAuthenticationSuccessHandler(userAuthenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(userAuthenticationFailureHandler);
         filter.setAuthRequestService(authRequestService);
+        // 认证
         OtherSysOauth2LoginProvider provider = new OtherSysOauth2LoginProvider();
         provider.setUserDetailsService(extendUserDetailsService);
         builder.authenticationProvider(provider).addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
@@ -106,11 +105,11 @@ public class OtherSysOauth2LoginAuthenticationSecurityConfig extends SecurityCon
         userBindFilter.setSysUsersDao(sysUsersDao);
         userBindFilter.setAuthenticationFailureHandler(userAuthenticationFailureHandler);
         userBindFilter.setAuthenticationSuccessHandler(userAuthenticationSuccessHandler);
+        // 认证
         BindLoginProvider bindLoginProvider = new BindLoginProvider();
         bindLoginProvider.setOtherSysUserDao(otherSysUserDao);
         bindLoginProvider.setUserDetailsService(userDetailsService);
         bindLoginProvider.setPasswordEncoder(passwordEncoder);
         builder.authenticationProvider(bindLoginProvider).addFilterBefore(userBindFilter, UsernamePasswordAuthenticationFilter.class);
-
     }
 }

@@ -149,6 +149,7 @@ public class OtherSysOauth2LoginFilter extends AbstractAuthenticationProcessingF
             } else {
                 // 存在绑定用户信息，说明不是第一次使用这个第三方平台登陆，执行认证流程
                 ReturnData returnData = this.getUsersService().loadUserByUsername(otherSysUser.getUsername());
+                // 这里直接使用了 user 的全部信息，设置到了 principal 主体中，方便使用
                 token = new OtherSysOauth2LoginAuthenticationToken(returnData.getInfo());
             }
         }

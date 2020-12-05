@@ -30,20 +30,6 @@ public class UserAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         response.setContentType("application/json;charset=UTF-8");
         ReturnData ret = ReturnData.newInstance();
-//        HttpSession session = request.getSession();
-//        String id = session.getId();
-//
-//        session.setAttribute("kkkk","vvv000");
-//
-//        Object kkkk = session.getAttribute("kkkk");
-//        log.info("{}",  kkkk);
-//
-//        Object spring_security_context = session.getAttribute("SPRING_SECURITY_CONTEXT");
-//        log.info("{}",  spring_security_context);
-
-
-//        Object principal = authentication.getPrincipal();
-
         ret.setSuccess();
         ret.setInfo(authentication);
         response.getWriter().write(JSON.toJSONString(ret));

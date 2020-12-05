@@ -29,7 +29,6 @@ public class OtherSysOauth2LoginUserDetailsServiceImpl {
     private UsersService usersService;
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
         ReturnData result = usersService.loadUserByUsername(username);
         if (RspCodeEnum.NOTOKEN.getCode() == result.getStatus()) {
             throw new RrException(RspCodeEnum.ACCOUNT_NOT_EXIST.getDesc());

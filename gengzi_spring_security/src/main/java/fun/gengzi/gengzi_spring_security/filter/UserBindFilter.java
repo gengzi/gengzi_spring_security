@@ -11,7 +11,6 @@ import fun.gengzi.gengzi_spring_security.utils.RedisUtil;
 import me.zhyd.oauth.model.AuthUser;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -42,8 +41,6 @@ import java.util.Date;
  *         userBindFilter.setSysUsersDao(sysUsersDao);
  *         // 再加入到 spring security 的过滤器链中
  *         httpSecurity.addFilterBefore(userBindFilter, UsernamePasswordAuthenticationFilter.class);
- *
- *
  *
  * @author gengzi
  * @date 2020年11月24日10:45:17
@@ -116,16 +113,18 @@ public class UserBindFilter extends
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
+        // 校验请求方式
         if (postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException(
                     "Authentication method not supported: " + request.getMethod());
         }
-
+        // 获取请求的入参
         String username = obtainUsername(request);
         String password = obtainPassword(request);
         String token = obtainToken(request);
         String sys = obtainScope(request);
 
+        // 参数校验部分
         if (username == null) {
             username = "";
         }
@@ -138,7 +137,7 @@ public class UserBindFilter extends
             throw new AuthenticationServiceException(
                     "token 参数缺失（The token parameter is missing）");
         }
-
+        // 从redis 缓存中获取第三方用户信息
         AuthUser authUser = (AuthUser) this.getRedisUtil().get(Oauth2LoginRedisKeysConstant.OTHER_SYS_USER_INFO + token);
         if (authUser == null) {
             throw new AuthenticationServiceException(
@@ -152,8 +151,7 @@ public class UserBindFilter extends
                     "输入用户名不存在（Enter username does not exist）");
         }
 
-
-        // 将用户信息
+        // 将用户信息构造为 OtherSysUser 对象
         String uuid = authUser.getUuid();
         OtherSysUser otherSysUser = new OtherSysUser();
         otherSysUser.setScope(sys);
@@ -161,21 +159,15 @@ public class UserBindFilter extends
         otherSysUser.setCreateTime(new Date());
         otherSysUser.setUserId(sysUser.getId());
         otherSysUser.setUsername(sysUser.getUsername());
-//        this.getOtherSysUserDao().save(otherSysUser);
-
 
         username = username.trim();
-
-
+        // 构造token
         BindAuthenticationToken bindAuthenticationToken = new BindAuthenticationToken(username, password,otherSysUser);
-
-//        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-//                username, password);
-
-        // Allow subclasses to set the "details" property
+        // 设置额外数据
         setDetails(request, bindAuthenticationToken);
-        // 移除缓存的用户数据
+        // 移除缓存的用户数据，以防用户下次继续使用
         this.getRedisUtil().del(Oauth2LoginRedisKeysConstant.OTHER_SYS_USER_INFO + token);
+        // 执行认证
         return this.getAuthenticationManager().authenticate(bindAuthenticationToken);
     }
 
